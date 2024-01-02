@@ -78,7 +78,7 @@ class vMFLogPartition(torch.autograd.Function):
 
 
 
-def density(mu, kappa, samples):
+def density(mu, kappa, samples): # mu: np.array size (16,), kappa: integer
     mu = torch.from_numpy(mu)
     kappa = torch.from_numpy(np.asarray(kappa))
     samples = torch.from_numpy(samples)
@@ -87,7 +87,7 @@ def density(mu, kappa, samples):
     logC = vMFLogPartition.apply(len(mu), kappa.float())
     logliks = kappa * dotp + logC
 
-    return logliks
+    return logliks # take the log of eq (1) in paper
 
 
 def sample_vMF(mu, kappa, num_samples):

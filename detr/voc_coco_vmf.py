@@ -46,14 +46,14 @@ prepos_feat = lambda x: np.ascontiguousarray(np.concatenate([normalizer(x)], axi
 
 
 if args.name == 'siren':
-    id_train_data = np.load('./snapshots/voc/' + name + '/id-pro_maha_train.npy')
+    id_train_data = np.load('./snapshots/voc/' + name + '/id-pro_maha_train.npy') # shape of [N, 17] => [28376, 17], hyperspherical embeddings r of training sample (Pascal VOC)
     id_train_data = torch.from_numpy(id_train_data).reshape(-1, length + 1)
     labels = id_train_data[:, -1].int()
     id_train_data = id_train_data[:, :-1]
     all_data_in = np.load('./snapshots/voc/' + name + '/id-pro.npy')
-    all_data_in = torch.from_numpy(all_data_in).reshape(-1, length)
+    all_data_in = torch.from_numpy(all_data_in).reshape(-1, length) # shape [M, 16] => [53523, 16]
     all_data_out = np.load('./snapshots/voc/' + name + '/ood-pro.npy')
-    all_data_out = torch.from_numpy(all_data_out).reshape(-1, length)
+    all_data_out = torch.from_numpy(all_data_out).reshape(-1, length) # shape [K, 16] => [4166, 16]
 else: # for vanilla
     id_train_data = np.load('./snapshots/voc/' + name + '/id-pen_maha_train.npy')
     id_train_data = torch.from_numpy(id_train_data).reshape(-1, length + 1)
@@ -90,20 +90,20 @@ for index in range(3,4):
         # breakpoint()
         data_train = id_train_data[:, 0:length] / np.linalg.norm(id_train_data[:, 0:length],
                                                                  ord=2, axis=-1, keepdims=True)
-        mean_class = np.zeros((20, length))
+        mean_class = np.zeros((20, length)) #shape [20, 16]
     class_id = labels.reshape(-1,1)
-    data_train = np.concatenate([data_train, class_id], 1)
+    data_train = np.concatenate([data_train, class_id], 1)  #shape [N, 17] => [28376, 17]
     sample_dict = {}
 
     for i in range(20):
         sample_dict[i] = []
-    for data in data_train:
+    for data in data_train: # loop through each row
         if int(data[-1]) == 20:
             print('hhh')
             continue
 
-        mean_class[int(data[-1])] += data[:-1]
-        sample_dict[int(data[-1])].append(data[:-1])
+        mean_class[int(data[-1])] += data[:-1]  # sum all rows of data_train with the same class 
+        sample_dict[int(data[-1])].append(data[:-1]) # dict of list, each list contains all rows of data_train with the same class 
     if index == 0:
         mean_class[5] = np.random.normal(0, 1, 256)
         sample_dict[5] = [np.random.normal(0, 1, 256)]
@@ -117,7 +117,7 @@ for index in range(3,4):
         pass
     for i in range(20):
         mean_class[i] = mean_class[i] / len(sample_dict[i])
-    mean_class = torch.from_numpy(mean_class)
+    mean_class = torch.from_numpy(mean_class) # shape [20, 16], take average over number of sample within each class, this is r_c (not ||r_c||) in eq.13 of paper
     mean_list.append(mean_class)
 
 print(len(all_data_out))
@@ -126,28 +126,28 @@ print(len(all_data_in))
 from vMF import density
 
 if args.use_trained_params:
-    mean_load = np.load('./snapshots/voc/' + args.name + '/proto.npy')
-    kappa_load = np.load('./snapshots/voc/' + args.name + '/kappa.npy')
+    mean_load = np.load('./snapshots/voc/' + args.name + '/proto.npy') # [20, 16]
+    kappa_load = np.load('./snapshots/voc/' + args.name + '/kappa.npy') # [1,20]
     print(kappa_load)
 
 gaussian_score = 0
 gaussian_score1 = 0
 for i in range(20):
-    if args.use_trained_params == 0:
-        batch_sample_mean = mean_list[-1][i]
-        xm_norm = (batch_sample_mean ** 2).sum().sqrt()
-        mu0 = batch_sample_mean / xm_norm
+    if args.use_trained_params == 0: # if not used learned kappa, then approximately estimate kappa according to eq. 13 
+        batch_sample_mean = mean_list[-1][i] # size [16,]
+        xm_norm = (batch_sample_mean ** 2).sum().sqrt() # ||r_c|| in eq.13
+        mu0 = batch_sample_mean / xm_norm  # eq. 15 supplementary
         print(xm_norm)
         kappa0 = (len(batch_sample_mean) * xm_norm - xm_norm ** 3) / (1 - xm_norm ** 2)
 
         prob_density = density(mu0.numpy(), kappa0.numpy(), F.normalize(all_data_in, p=2, dim=-1).numpy())
         prob_density1 = density(mu0.numpy(), kappa0.numpy(), F.normalize(all_data_out, p=2, dim=-1).numpy())
         print(kappa0)
-    else:
+    else: # use learned kappa
         mu0 = mean_load[i]
         kappa0 = kappa_load[0][i]
 
-        prob_density = (density(mu0, kappa0, F.normalize(all_data_in, p=2, dim=-1).numpy()))
+        prob_density = (density(mu0, kappa0, F.normalize(all_data_in, p=2, dim=-1).numpy())) # size [53523], log of eq(1) in paper
         prob_density1 = (density(mu0, kappa0, F.normalize(all_data_out, p=2, dim=-1).numpy()))
 
 
@@ -159,7 +159,8 @@ for i in range(20):
         gaussian_score = torch.cat((gaussian_score, prob_density.view(-1,1)), 1)
         gaussian_score1 = torch.cat((gaussian_score1, prob_density1.view(-1, 1)), 1)
 
-
+#gaussian_score: [M, 20] => [53523,20] take the vMF score (eq.9 paper) for each class, each ID(PascalVOC) sample 
+#gaussian_score1:[K, 20] => [4166, 20], same but with respect to OOD (COCO)
 
 
 

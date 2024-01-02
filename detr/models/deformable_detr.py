@@ -28,7 +28,7 @@ def _get_clones(module, N):
     return nn.ModuleList([copy.deepcopy(module) for i in range(N)])
 
 
-class DeformableDETR(nn.Module):
+class DeformableDETR(nn.Module): # This is the Deformable DETR module that performs object detection
     """ This is the Deformable DETR module that performs object detection """
     def __init__(self, backbone, transformer, num_classes, num_queries, num_feature_levels,
                  aux_loss=True, with_box_refine=False, two_stage=False, object_embedding_loss=False,
@@ -110,7 +110,7 @@ class DeformableDETR(nn.Module):
             nn.init.xavier_uniform_(proj[0].weight, gain=1)
             nn.init.constant_(proj[0].bias, 0)
 
-        if self.args.siren:
+        if self.args.siren: # add siren to DETR
             self.learnable_kappa = nn.Linear(num_classes,1, bias=False).cuda()
             torch.nn.init.constant_(self.learnable_kappa.weight, self.args.learnable_kappa_init)
         # if two-stage, the last class_embed and bbox_embed is for region proposal generation
@@ -259,7 +259,7 @@ class DeformableDETR(nn.Module):
                     for a, b in zip(outputs_class[:-1], outputs_coord[:-1])]  # , outputs_features[:-1])]
 
 
-class SetCriterion(nn.Module):
+class SetCriterion(nn.Module): #  This class computes the loss for DETR.
     """ This class computes the loss for DETR.
     The process happens in two steps:
         1) we compute hungarian assignment between ground truth boxes and the outputs of the model
@@ -612,7 +612,7 @@ class SetCriterion(nn.Module):
         return losses
 
 
-class PostProcess(nn.Module):
+class PostProcess(nn.Module): # This module converts the model's output into the format expected by the coco api
     """ This module converts the model's output into the format expected by the coco api"""
 
     @torch.no_grad()
@@ -675,7 +675,7 @@ class PostProcess(nn.Module):
 
 
     @torch.no_grad()
-    def forward_maha(self, outputs, targets, target_sizes):
+    def forward_maha(self, outputs, targets, target_sizes):# only being used in evaluate_ood_id
         """ Perform the computation
         Parameters:
             outputs: raw outputs of the model

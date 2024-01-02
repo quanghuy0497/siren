@@ -14,7 +14,7 @@ import math
 import os
 import sys
 from typing import Iterable
-
+import json
 import torch
 import util.misc as utils
 from datasets.coco_eval import CocoEvaluator
@@ -427,6 +427,9 @@ def evaluate_ood_id(args, model, criterion, postprocessors, data_loader, base_ds
 
 
 def evaluate_ood_ood(model, criterion, postprocessors, data_loader, base_ds, device, output_dir, address, dataset, vis_prediction_results):
+    #model: Deformable DETR
+    #criterion: compute loss for DETR
+    #postprocessors:  = {'bbox': DefPostProcess()}. This module converts the model's output into the format expected by the coco api
     model.eval()
     criterion.eval()
     original_siren_flag = criterion.args.siren_evaluate
@@ -454,9 +457,10 @@ def evaluate_ood_ood(model, criterion, postprocessors, data_loader, base_ds, dev
             data_loader.dataset.ann_folder,
             output_dir=os.path.join(output_dir, "panoptic_eval"),
         )
-
+    f = open(os.path.join(output_dir, 'DETR_Pascal_COCO.json'), 'w')
+    json_data = {}
     for samples, targets in data_loader:#metric_logger.log_every(data_loader, 10, header):
-        samples = samples.to(device)
+        samples = samples.to(device) # what is the structure of samples, targets ?
         # breakpoint()
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
@@ -476,7 +480,7 @@ def evaluate_ood_ood(model, criterion, postprocessors, data_loader, base_ds, dev
         results = postprocessors['bbox'](outputs, orig_target_sizes)
 
 
-        if results[0]['logits_for_ood_eval'].shape[1] == 0:
+        if results[0]['logits_for_ood_eval'].shape[1] == 0: # number saved images = len(data_loader - num_omitted)
             continue
         import numpy as np
         if all_logits is None:
@@ -509,7 +513,7 @@ def evaluate_ood_ood(model, criterion, postprocessors, data_loader, base_ds, dev
 
                 project_features = np.concatenate((project_features, temp), 0)
 
-        if results[0]['sampling_cls'] is not None:
+        if results[0]['sampling_cls'] is not None: # always None
             if sampling_cls is None:
                 sampling_cls = results[0]['sampling_cls'].view(-1,
                                                       results[0]['sampling_cls'].shape[2]).cpu().data.numpy()
@@ -519,7 +523,7 @@ def evaluate_ood_ood(model, criterion, postprocessors, data_loader, base_ds, dev
 
                 sampling_cls = np.concatenate((sampling_cls, temp), 0)
 
-        if results[0]['godin_h'] is not None:
+        if results[0]['godin_h'] is not None: #always None
             if out_godin_h is None:
                 out_godin_h = results[0]['godin_h'].view(-1,
                                                       results[0]['godin_h'].shape[2]).cpu().data.numpy()
@@ -531,7 +535,7 @@ def evaluate_ood_ood(model, criterion, postprocessors, data_loader, base_ds, dev
 
         # all_logits.append(results[0]['logits_for_ood_eval'].cpu().data.numpy())
         if vis_prediction_results:
-            visualize_prediction_results(samples, results, output_dir, targets, True)
+            visualize_prediction_results(samples, results, output_dir, targets, json_data, True)
         continue
         loss_dict = criterion(outputs, targets)
         weight_dict = criterion.weight_dict
@@ -577,7 +581,8 @@ def evaluate_ood_ood(model, criterion, postprocessors, data_loader, base_ds, dev
                 res_pano[i]["file_name"] = file_name
 
             panoptic_evaluator.update(res_pano)
-
+    json.dump(json_data, f)
+    f.close()
     if dataset == 'openimages_ood_val':
         np.save(address + 'ood-open-logits.npy', all_logits)
         np.save(address + 'ood-open-pen.npy', pen_features)

@@ -1,0 +1,10 @@
+*/__pycache__/
+*.pyc
+*.pth
+*.egg
+*.o
+*.txt
+*.so
+*.npy
+*.png
+*.jpg

@@ -22,11 +22,15 @@ def plot_image(ax, img, norm):
     ax.imshow(img)
 
 
-def plot_results(pil_img, prob, boxes, output_dir, classes, targets, ood=False):
+def plot_results(pil_img, prob, boxes, output_dir, classes, targets, json_data, ood=False):
     plt.figure(figsize=(16, 10))
     # plt.imshow(pil_img)
     ax = plt.gca()
     image = plot_image(ax, pil_img, True)
+    #add data to json file
+    image_name = str(int(targets[0]["image_id"][0])).zfill(12) + '.jpg'
+    prediction = []
+    obj_id = 0
     # breakpoint()
     for p, cl, (xmin, ymin, xmax, ymax), c in zip(prob, classes, boxes.tolist(), COLORS * 100):
         ax.add_patch(plt.Rectangle((xmin, ymin), xmax - xmin, ymax - ymin,
@@ -35,6 +39,10 @@ def plot_results(pil_img, prob, boxes, output_dir, classes, targets, ood=False):
         text = f'{CLASSES[cl]}: {p:0.2f}'
         ax.text(xmin, ymin, text, fontsize=15,
                 bbox=dict(facecolor='yellow', alpha=0.5))
+        prediction.append({str(obj_id): {"category": CLASSES[cl], "bounding_box": {"x1": round(xmin,3), "y1": round(ymin,3), "x2": round(xmax,3), "y2": round(ymax,3)}}})
+        obj_id = obj_id + 1
+    if prediction: 
+        json_data[image_name] = prediction
     plt.axis('off')
     # plt.show()
     print('hhh')
@@ -52,10 +60,11 @@ def rescale_bboxes(out_bbox, size):
     # breakpoint()
     return b
 
-def visualize_prediction_results(samples, result, output_dir, targets, ood):
+def visualize_prediction_results(samples, result, output_dir, targets, json_data, ood): #all images scale the smallest size to 800
     # breakpoint()
     probas = result[0]['scores']
-    keep = probas > 0.5
+    keep = probas > 0.5 # if probability is less than 0.5, then not predict. If not set this, a lot of bounding boxes are predicted. 
+    #keep = probas > 0.0
     # breakpoint()
     images = samples.tensors[0].cpu().permute(1,2,0).numpy()
     # breakpoint()
@@ -64,6 +73,6 @@ def visualize_prediction_results(samples, result, output_dir, targets, ood):
 
     classes = result[0]['labels'][keep]
     plot_results(images, probas[keep], bboxes_scaled,
-                 output_dir, classes, targets, ood)
+                 output_dir, classes, targets, json_data, ood)
     # breakpoint()
     return

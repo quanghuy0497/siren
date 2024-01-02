@@ -62,6 +62,9 @@ def main(args):
         elif args.obj_embedding_head == 'intermediate':
             swav_model = build_swav_backbone_old(args, device)
     model, criterion, postprocessors = build_model(args)
+    # model: Deformable DETR module that performs object detection
+    # criterion: This class computes the loss for DETR
+    # postprocessors: This module converts the model's output into the format expected by the coco api
     model.to(device)
 
     model_without_ddp = model
@@ -206,7 +209,7 @@ def main(args):
         if 'ood' in args.dataset:
             test_stats, coco_evaluator = evaluate_ood_ood(model, criterion, postprocessors,
                                                   data_loader_val, base_ds, device, args.output_dir, args.resume.split('checkpoint.pth')[0],
-                                                          args.dataset,args.viz_prediction_results)
+                                                          args.dataset,args.viz_prediction_results) # this line will generate ood-logits, ood-pen and ood-pro
         else:
             test_stats, coco_evaluator = evaluate_ood_id(args, model, criterion, postprocessors,
                                                   data_loader_val, base_ds, device, args.output_dir,
@@ -215,11 +218,11 @@ def main(args):
             utils.save_on_master(coco_evaluator.coco_eval["bbox"].eval, output_dir / "eval.pth")
         return
 
-    if args.viz:
+    if args.viz: # flag 'viz' does not have effect when validating, instead we use flag 'viz_prediction_results'
         viz(model, criterion, postprocessors,
             data_loader_val, base_ds, device, args.output_dir)
         return
-
+# Below part only apply for training, if args.eval == false
     print("Start training")
     start_time = time.time()
     for epoch in range(args.start_epoch, args.epochs):
@@ -312,7 +315,7 @@ def get_datasets(args):
             dataset_val = VOCDetection(args.voc_path, ["2007", "2012"], image_sets=['trainval', 'trainval'],
                                          transforms=make_coco_transforms('train'), filter_pct=args.filter_pct)
             dataset_train = VOCDetection(args.voc_path, ["2007"], image_sets=[
-                'test'], transforms=make_coco_transforms('val'))
+                'test'], transforms=make_coco_transforms('val')) # if we use flag --maha_train, then dataset_val and dataset_train change places with each other. 
     elif args.dataset == 'bdd':
         if not args.maha_train:
             dataset_train = build_dataset(image_set='train', args=args)
@@ -320,7 +323,7 @@ def get_datasets(args):
         else:
             dataset_train = build_dataset(image_set='val', args=args)
             dataset_val = build_dataset(image_set='train', args=args)
-    elif args.dataset == 'coco_ood_val':
+    elif args.dataset == 'coco_ood_val':# 
         dataset_train = build_dataset(image_set='train', args=args)
         dataset_val = build_dataset(image_set='val', args=args)
     elif args.dataset == 'coco_ood_val_bdd':
@@ -336,17 +339,17 @@ def get_datasets(args):
 
 
 def set_dataset_path(args):
-    args.data_root = '/nobackup-slow/dataset/my_xfdu/'
+    args.data_root = '/app/'
     args.bdd_root = '/nobackup-slow/dataset/my_xfdu/bdd-100k/bdd100k/images/100k/'
     args.bdd_ann_root_train = '/nobackup-slow/dataset/my_xfdu/bdd-100k/bdd100k/train_bdd_converted.json'
     args.bdd_ann_root_test = '/nobackup-slow/dataset/my_xfdu/bdd-100k/bdd100k/val_bdd_converted.json'
-    args.open_root = '/nobackup-slow/dataset/my_xfdu/OpenImages/ood_classes_rm_overlap/images'
-    args.open_ann_root = '/nobackup-slow/dataset/my_xfdu/OpenImages/ood_classes_rm_overlap/COCO-Format/val_coco_format.json'
-    args.coco_path = os.path.join(args.data_root, 'coco2017')
+    args.open_root = os.path.join(args.data_root, 'OPENIMAGES_DATASET_ROOT/ood_classes_rm_overlap/images')
+    args.open_ann_root = os.path.join(args.data_root, 'OPENIMAGES_DATASET_ROOT/ood_classes_rm_overlap/COCO-Format/val_coco_format.json')
+    args.coco_path = os.path.join(args.data_root, 'COCO_DATASET_ROOT')
     args.airbus_path = os.path.join(args.data_root, 'airbus-ship-detection')
     args.imagenet_path = os.path.join(args.data_root, 'ilsvrc')
     args.imagenet100_path = os.path.join(args.data_root, 'ilsvrc100')
-    args.voc_path = os.path.join(args.data_root, '')
+    args.voc_path = os.path.join(args.data_root, 'VOC_DATASET_ROOT')
 
 
 if __name__ == '__main__':

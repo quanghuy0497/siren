@@ -26,7 +26,7 @@ default_settings = {
 
 
 def set_model_defaults(args):
-    defaults = default_settings[args.model]
+    defaults = default_settings[args.model] # deformable_detr
     runtime_args = vars(args)
     for k, v in runtime_args.items():
         if v is None and k in defaults:
@@ -141,10 +141,10 @@ def get_args_parser():
     parser.add_argument('--save_every', default=1, type=int)
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                         help='start epoch')
-    parser.add_argument('--eval', action='store_true')
-    parser.add_argument('--viz', action='store_true')
+    parser.add_argument('--eval', action='store_true') # 
+    parser.add_argument('--viz', action='store_true') # 
     parser.add_argument('--maha_train', action='store_true')
-    parser.add_argument('--viz_prediction_results', action='store_true')
+    parser.add_argument('--viz_prediction_results', action='store_true') # 
     parser.add_argument('--objectness', action='store_true')
     parser.add_argument('--num_workers', default=2, type=int)
     parser.add_argument('--cache_mode', default=False, action='store_true', help='whether to cache images on memory')
