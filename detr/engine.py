@@ -583,24 +583,24 @@ def evaluate_ood_ood(model, criterion, postprocessors, data_loader, base_ds, dev
             panoptic_evaluator.update(res_pano)
     json.dump(json_data, f)
     f.close()
-    if dataset == 'openimages_ood_val':
+    if dataset == 'openimages_ood_val_bdd_voc':
         np.save(address + 'ood-open-logits.npy', all_logits)
         np.save(address + 'ood-open-pen.npy', pen_features)
     else:
         np.save(address + 'ood-logits.npy', all_logits)
         np.save(address + 'ood-pen.npy', pen_features)
     if project_features is not None:
-        if dataset == 'openimages_ood_val':
+        if dataset == 'openimages_ood_val_bdd_voc':
             np.save(address + 'ood-open-pro.npy', project_features)
         else:
             np.save(address + 'ood-pro.npy', project_features)
     if sampling_cls is not None:
-        if dataset == 'openimages_ood_val':
+        if dataset == 'openimages_ood_val_bdd_voc':
             np.save(address + 'ood-open-sampling.npy', sampling_cls)
         else:
             np.save(address + 'ood-sampling.npy', sampling_cls)
     if out_godin_h is not None:
-        if dataset == 'openimages_ood_val':
+        if dataset == 'openimages_ood_val_bdd_voc':
             np.save(address + 'ood-open-godin.npy', out_godin_h)
         else:
             np.save(address + 'ood-godin.npy', out_godin_h)

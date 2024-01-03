@@ -616,7 +616,7 @@ def get_train_contiguous_id_to_test_thing_dataset_id_dict(
             from collections import ChainMap
             cat_mapping_dict = dict(
                         ChainMap(*[{i: i + 1} for i in range(10)]))
-        elif 'openimages_ood_val' == args.test_dataset and 'voc_custom_train' == cfg.DATASETS.TRAIN[0]:
+        elif 'openimages_ood_val_bdd_voc' == args.test_dataset and 'voc_custom_train' == cfg.DATASETS.TRAIN[0]:
             from collections import ChainMap
             cat_mapping_dict = dict(
                 ChainMap(*[{i: i + 1} for i in range(20)]))
@@ -624,7 +624,7 @@ def get_train_contiguous_id_to_test_thing_dataset_id_dict(
             from collections import ChainMap
             cat_mapping_dict = dict(
                 ChainMap(*[{i: i + 1} for i in range(10)]))
-        elif 'openimages_ood_val' == args.test_dataset and 'bdd_custom_train' == cfg.DATASETS.TRAIN[0]:
+        elif 'openimages_ood_val_bdd_voc' == args.test_dataset and 'bdd_custom_train' == cfg.DATASETS.TRAIN[0]:
             from collections import ChainMap
             cat_mapping_dict = dict(
                 ChainMap(*[{i: i + 1} for i in range(10)]))

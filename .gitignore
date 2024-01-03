@@ -1,6 +1,7 @@
 */__pycache__/
 data/*
 !data/README.md
+
 *.pyc
 *.pth
 *.egg

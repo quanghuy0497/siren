@@ -177,19 +177,19 @@ def build(image_set, args): # image_set: "train" or "val"
     assert root.exists(), f'provided COCO path {root} does not exist'
     mode = 'instances'
     bdd=False
-    if args.dataset == 'coco_ood_val': # 
+    if args.dataset == 'coco_ood_val_voc':              # COCO as OOD, VOC as ID
         PATHS = {
-            "train": (root / "train2017", root / "annotations" / f'{mode}_train2017.json'),
-            "val": (root / "val2017", root / "annotations" / f'{mode}_val2017_ood_rm_overlap.json'),
+            # "train": (root / "train2017", root / "annotations" / f'{mode}_train2017.json'),
+            "val": (root / "val2017", root / "annotations" / f'{mode}_val2017_ood_wrt_voc_rm_overlap.json'),
         }
-    elif args.dataset == 'coco_ood_val_bdd':
+    elif args.dataset == 'coco_ood_val_bdd':            # COCO as OOD, BDD as ID
         PATHS = {
-            "train": (root / "train2017", root / "annotations" / f'{mode}_train2017.json'),
+            # "train": (root / "train2017", root / "annotations" / f'{mode}_train2017.json'),
             "val": (root / "val2017", root / "annotations" / f'{mode}_val2017_ood_wrt_bdd_rm_overlap.json'),
         }
-    elif args.dataset == 'openimages_ood_val':
+    elif args.dataset == 'openimages_ood_val_bdd_voc':
         PATHS = {
-            "train": (root / "train2017", root / "annotations" / f'{mode}_train2017.json'),
+            # "train": (root / "train2017", root / "annotations" / f'{mode}_train2017.json'),
             "val": (args.open_root, args.open_ann_root),
         }
     elif args.dataset == 'bdd':

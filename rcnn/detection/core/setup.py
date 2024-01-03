@@ -58,7 +58,7 @@ def setup_arg_parser():
         "--test-dataset",
         type=str,
         default="",
-        help="Inference parameter: Dataset used for testing. Can be one of the following: 'coco_2017_custom_val', 'openimages_val', 'openimages_ood_val' ")
+        help="Inference parameter: Dataset used for testing. Can be one of the following: 'coco_2017_custom_val', 'openimages_val', 'openimages_ood_val_bdd_voc' ")
 
     arg_parser.add_argument(
         "--image-corruption-level",
