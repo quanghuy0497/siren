@@ -1,5 +1,6 @@
 */__pycache__/
 data/*
+detr/models/ops/build/*
 !data/README.md
 
 *.pyc

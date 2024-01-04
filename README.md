@@ -132,7 +132,7 @@ GPUS_PER_NODE=8 ./tools/run_dist_launch.sh 8 ./configs/voc/siren.sh voc_id
 
 Firstly run on the in-distribution dataset:
 ```
---
+./configs/voc/<config file>.sh voc_id --resume snapshots/voc/<config file>/checkpoint.pth --eval
 ```
 Then run on the in-distribution training dataset (not required for vMF score):
 ```
