@@ -435,7 +435,7 @@ def init_distributed_mode(args):
 
 
 @torch.no_grad()
-def accuracy(output, target, topk=(5,)):
+def accuracy(output, target, topk=(1,)):           
     """Computes the precision@k for the specified values of k"""
     if target.numel() == 0:
         return [torch.zeros([], device=output.device)]
