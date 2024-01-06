@@ -298,7 +298,7 @@ def get_datasets(args):
             # if we use flag --maha_train, then dataset_val and dataset_train change places with each other. 
     elif args.dataset == 'bdd':
         if not args.maha_train:
-            dataset_train = build_dataset(image_set='train', args=args)
+            dataset_train = build_dataset(image_set='val', args=args)
             dataset_val = build_dataset(image_set='val', args=args)
         else:
             dataset_train = build_dataset(image_set='val', args=args)
