@@ -241,3 +241,17 @@ If you found any part of this code is useful in your research, please consider c
   year={2022}
 }
 ```
+
+
+
+##### Note for Chi
+Command for running, but please modify it depending on the setting:
+
+```
+GPUS_PER_NODE=1./tools/run_dist_launch.sh 1 ./configs/voc/siren.sh coco_ood --resume checkpoint/checkpoint_voc_siren.pth --eval --viz_prediction_results
+```
+
+If you cannot run script file under `.\`, such as `.\siren.sh` (error `permission denide`), please run `chmod u+x example.sh`
+
+
+There might be error, but mostly due to the data path. Fix it please

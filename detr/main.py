@@ -303,13 +303,13 @@ def get_datasets(args):
         else:
             dataset_train = build_dataset(image_set='val', args=args)
             dataset_val = build_dataset(image_set='train', args=args)
-    elif args.dataset == 'coco_ood_val_voc':
+    elif args.dataset == 'coco_ood_val':
         dataset_train = build_dataset(image_set='train', args=args)
         dataset_val = build_dataset(image_set='val', args=args)
     elif args.dataset == 'coco_ood_val_bdd':
         dataset_train = build_dataset(image_set='train', args=args)
         dataset_val = build_dataset(image_set='val', args=args)
-    elif args.dataset == 'openimages_ood_val_bdd_voc':
+    elif args.dataset == 'openimages_ood_val':
         dataset_train = build_dataset(image_set='train', args=args)
         dataset_val = build_dataset(image_set='val', args=args)
     else:
