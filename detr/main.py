@@ -13,6 +13,7 @@ import datetime
 import json
 import random
 import time
+import pdb
 from pathlib import Path
 
 import numpy as np
@@ -73,6 +74,8 @@ def main(args):
     print('number of params:', n_parameters)
 
     dataset_train, dataset_val = get_datasets(args)
+    # pdb.set_trace()
+
 
     if args.distributed:
         if args.cache_mode:
@@ -93,6 +96,7 @@ def main(args):
     data_loader_train = DataLoader(dataset_train, batch_sampler=batch_sampler_train,
                                    collate_fn=utils.collate_fn, num_workers=args.num_workers,
                                    pin_memory=True)
+
     data_loader_val = DataLoader(dataset_val, args.batch_size, sampler=sampler_val,
                                  drop_last=False, collate_fn=utils.collate_fn, num_workers=args.num_workers,
                                  pin_memory=True)
@@ -290,7 +294,7 @@ def get_datasets(args):
         from datasets.torchvision_datasets.voc import VOCDetection
         from datasets.coco import make_coco_transforms
         if not args.maha_train:
-            dataset_train = VOCDetection(args.voc_path, ["2007", "2012"], image_sets=['trainval', 'trainval'], transforms=make_coco_transforms('train'), filter_pct=args.filter_pct)
+            dataset_train = VOCDetection(args.voc_path, ["2007", "2012"], image_sets=['trainval', 'trainval'], transforms=make_coco_transforms('val'), filter_pct=args.filter_pct)
             dataset_val = VOCDetection(args.voc_path, ["2007"], image_sets=['test'], transforms=make_coco_transforms('val'))
         else:
             dataset_val = VOCDetection(args.voc_path, ["2007", "2012"], image_sets=['trainval', 'trainval'], transforms=make_coco_transforms('train'), filter_pct=args.filter_pct)

@@ -51,6 +51,8 @@ class CocoDetection(VisionDataset):
             if index % self.local_size != self.local_rank:
                 continue
             path = self.coco.loadImgs(img_id)[0]['file_name']
+            
+            
             with open(os.path.join(self.root, path), 'rb') as f:
                 self.cache[path] = f.read()
 
@@ -60,6 +62,7 @@ class CocoDetection(VisionDataset):
                 with open(os.path.join(self.root, path), 'rb') as f:
                     self.cache[path] = f.read()
             return Image.open(BytesIO(self.cache[path])).convert('RGB')
+
         return Image.open(os.path.join(self.root, path)).convert('RGB')
 
     def __getitem__(self, index):
@@ -67,7 +70,7 @@ class CocoDetection(VisionDataset):
         Args:
             index (int): Index
         Returns:
-            tuple: Tuple (image, target). target is the object returned by ``coco.loadAnns``.
+            tuple: Tuple (image, target, original_file_name). target is the object returned by ``coco.loadAnns``.
         """
         coco = self.coco
         img_id = self.ids[index]
@@ -83,15 +86,17 @@ class CocoDetection(VisionDataset):
                 path = [coco.imgs[img_id]]
         else:
             path = [coco.imgs[img_id]]
+            
 
         path = path[0]['file_name']
+        # print(path)
         # path = coco.loadImgs(img_id)[0]['file_name']
 
         img = self.get_image(path)
         if self.transforms is not None:
             img, target = self.transforms(img, target)
 
-        return img, target
+        return img, target, path
 
     def __len__(self):
         return len(self.ids)

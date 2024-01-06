@@ -32,6 +32,7 @@ class CocoPanoptic:
         if "annotations" in self.coco:
             for img, ann in zip(self.coco['images'], self.coco['annotations']):
                 assert img['file_name'][:-4] == ann['file_name'][:-4]
+                
 
         self.img_folder = img_folder
         self.ann_folder = ann_folder
@@ -43,7 +44,7 @@ class CocoPanoptic:
         ann_info = self.coco['annotations'][idx] if "annotations" in self.coco else self.coco['images'][idx]
         img_path = Path(self.img_folder) / ann_info['file_name'].replace('.png', '.jpg')
         ann_path = Path(self.ann_folder) / ann_info['file_name']
-
+  
         img = Image.open(img_path).convert('RGB')
         w, h = img.size
         if "segments_info" in ann_info:
@@ -58,6 +59,8 @@ class CocoPanoptic:
 
         target = {}
         target['image_id'] = torch.tensor([ann_info['image_id'] if "image_id" in ann_info else ann_info["id"]])
+        
+
         if self.return_masks:
             target['masks'] = masks
         target['labels'] = labels

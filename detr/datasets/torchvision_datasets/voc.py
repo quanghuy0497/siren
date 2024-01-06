@@ -5,7 +5,8 @@ import torch
 import os
 import tarfile
 import collections
-
+import pdb
+        
 from torchvision.datasets import VisionDataset
 
 import numpy as np
@@ -140,6 +141,7 @@ class VOCDetection(VisionDataset):
 
     @staticmethod
     def convert_image_id(img_id, to_integer=False, to_string=False, prefix='2021'):
+        
         if to_integer:
             return int(prefix + img_id.replace('_', ''))
         if to_string:
@@ -155,7 +157,9 @@ class VOCDetection(VisionDataset):
         tree = ET.parse(self.imgid2annotations[img_id])
         target = self.parse_voc_xml(tree.getroot())
 
-        image_id = target['annotation']['filename']
+        # image_id = target['annotation']['filename']
+
+
         instances = []
         for obj in target['annotation']['object']:
             cls = obj["name"]
@@ -197,10 +201,12 @@ class VOCDetection(VisionDataset):
             index (int): Index
 
         Returns:
-            tuple: (image, target) where target is a dictionary of the XML tree.
+            tuple: (image, target, original_file_name) where target is a dictionary of the XML tree.
         """
         img = Image.open(self.images[index]).convert('RGB')
         target, instances = self.load_instances(self.imgids[index])
+
+        file_name = target['annotation']['filename']
 
         w, h = map(target['annotation']['size'].get, ['width', 'height'])
         target = dict(
@@ -215,8 +221,9 @@ class VOCDetection(VisionDataset):
 
         if self.transforms is not None:
             img, target = self.transforms(img, target)
+       
 
-        return img, target
+        return img, target, file_name
 
     def __len__(self):
         return len(self.images)

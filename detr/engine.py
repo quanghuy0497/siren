@@ -124,6 +124,7 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
         samples = samples.to(device)
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
+
         if 'loaddet' in output_dir:
             outputs = dict(pred_logits=[], pred_boxes=[])
             for i, target in enumerate(targets):
@@ -172,6 +173,7 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
             target_sizes = torch.stack([t["size"] for t in targets], dim=0)
             results = postprocessors['segm'](results, outputs, orig_target_sizes, target_sizes)
         res = {target['image_id'].item(): output for target, output in zip(targets, results)}
+
         if coco_evaluator is not None:
             coco_evaluator.update(res)
 
@@ -257,9 +259,10 @@ def evaluate_ood_id(args, model, criterion, postprocessors, data_loader, base_ds
             output_dir=os.path.join(output_dir, "panoptic_eval"),
         )
     index_cur = 0
-    for samples, targets in metric_logger.log_every(data_loader, 10, header):
+    for samples, targets, original_file_name in metric_logger.log_every(data_loader, 10, header):
         samples = samples.to(device)
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
+        
         if dataset == 'bdd':
             if index_cur > 20000:
                 break
@@ -362,7 +365,7 @@ def evaluate_ood_id(args, model, criterion, postprocessors, data_loader, base_ds
         # print(all_logits.shape)
 
         if vis_prediction_results:
-            visualize_prediction_results(samples, results, output_dir, targets, json_data, dataset, ood = False)
+            visualize_prediction_results(samples, results, output_dir, targets, json_data, dataset, original_file_name, ood = False)
         if 'savedet' in output_dir:
             os.makedirs(output_dir, exist_ok=True)
             for i, target in enumerate(targets):
@@ -487,7 +490,7 @@ def evaluate_ood_ood(model, criterion, postprocessors, data_loader, base_ds, dev
     f = open(os.path.join(output_dir, f'{backbone_name}_{dataset_setting}.json'), 'w')
     
     json_data = {}
-    for samples, targets in data_loader:#metric_logger.log_every(data_loader, 10, header):
+    for samples, targets, original_file_name in data_loader:#metric_logger.log_every(data_loader, 10, header):
         samples = samples.to(device) # what is the structure of samples, targets ?
         # breakpoint()
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
@@ -563,7 +566,7 @@ def evaluate_ood_ood(model, criterion, postprocessors, data_loader, base_ds, dev
 
         # all_logits.append(results[0]['logits_for_ood_eval'].cpu().data.numpy())
         if vis_prediction_results:
-            visualize_prediction_results(samples, results, output_dir, targets, json_data, dataset, ood=True)
+            visualize_prediction_results(samples, results, output_dir, targets, json_data, dataset, original_file_name, ood=True)
         continue
         loss_dict = criterion(outputs, targets)
         weight_dict = criterion.weight_dict

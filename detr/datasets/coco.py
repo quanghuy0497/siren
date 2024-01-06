@@ -36,7 +36,7 @@ class CocoDetection(TvCocoDetection):
             self.ids = np.random.choice(self.ids, size=round(num_keep), replace=False).tolist()
 
     def __getitem__(self, idx):
-        img, target = super(CocoDetection, self).__getitem__(idx)
+        img, target, original_file_name = super(CocoDetection, self).__getitem__(idx)
         image_id = self.ids[idx]
         target = {'image_id': image_id, 'annotations': target}
         img, target = self.prepare(img, target)
@@ -46,7 +46,7 @@ class CocoDetection(TvCocoDetection):
             target['labels'][:] = 1
         if self.bdd:
             target['labels'] -= 1
-        return img, target
+        return img, target, original_file_name
 
 
 def convert_coco_poly_to_mask(segmentations, height, width):
@@ -119,6 +119,7 @@ class ConvertCocoPolysToMask(object):
         if keypoints is not None:
             target["keypoints"] = keypoints
 
+
         # for conversion to coco api
         area = torch.tensor([obj["area"] for obj in anno])
         iscrowd = torch.tensor([obj["iscrowd"] if "iscrowd" in obj else 0 for obj in anno])
@@ -177,7 +178,7 @@ def build(image_set, args): # image_set: "train" or "val"
     assert root.exists(), f'provided COCO path {root} does not exist'
     mode = 'instances'
     bdd=False
-    if args.dataset == 'coco_ood_val_voc':              # COCO as OOD, VOC as ID
+    if args.dataset == 'coco_ood_val':              # COCO as OOD, VOC as ID
         PATHS = {
             # "train": (root / "train2017", root / "annotations" / f'{mode}_train2017.json'),
             "val": (root / "val2017", root / "annotations" / f'{mode}_val2017_ood_wrt_voc_rm_overlap.json'),
@@ -187,7 +188,7 @@ def build(image_set, args): # image_set: "train" or "val"
             # "train": (root / "train2017", root / "annotations" / f'{mode}_train2017.json'),
             "val": (root / "val2017", root / "annotations" / f'{mode}_val2017_ood_wrt_bdd_rm_overlap.json'),
         }
-    elif args.dataset == 'openimages_ood_val_bdd_voc':
+    elif args.dataset == 'openimages_ood_val':
         PATHS = {
             # "train": (root / "train2017", root / "annotations" / f'{mode}_train2017.json'),
             "val": (args.open_root, args.open_ann_root),
