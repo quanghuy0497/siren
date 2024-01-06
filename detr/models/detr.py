@@ -4,7 +4,7 @@ DETR model and criterion classes.
 import torch
 import torch.nn.functional as F
 from torch import nn
-
+import pdb
 from util import box_ops
 from util.misc import (NestedTensor, nested_tensor_from_tensor_list,
                        accuracy, get_world_size, interpolate,
@@ -307,6 +307,7 @@ class PostProcess(nn.Module):
 
         prob = F.softmax(out_logits, -1)
         scores, labels = prob[..., :-1].max(-1)
+
 
         # convert to [x0, y0, x1, y1] format
         boxes = box_ops.box_cxcywh_to_xyxy(out_bbox)

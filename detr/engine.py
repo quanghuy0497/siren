@@ -15,6 +15,7 @@ import os
 import sys
 from typing import Iterable
 import json
+import pdb
 import torch
 import util.misc as utils
 from datasets.coco_eval import CocoEvaluator
@@ -231,6 +232,17 @@ def evaluate_ood_id(args, model, criterion, postprocessors, data_loader, base_ds
     metric_logger = utils.MetricLogger(delimiter="  ")
     metric_logger.add_meter('class_error', utils.SmoothedValue(window_size=1, fmt='{value:.2f}'))
     header = 'Test:'
+    
+    if dataset == "voc":
+        dataset_setting = "VOC_id"
+    else:
+        dataset_setting = "BDD_id"    
+        
+    backbone_name = "DETR" if "siren" in output_dir else "FasterRCNN"
+    
+    f = open(os.path.join(output_dir, f'{backbone_name}_{dataset_setting}.json'), 'w')
+    json_data = {}
+    
 
     iou_types = tuple(k for k in ('segm', 'bbox') if k in postprocessors.keys())
     # breakpoint()
@@ -348,8 +360,9 @@ def evaluate_ood_id(args, model, criterion, postprocessors, data_loader, base_ds
 
         # all_logits.append(results[0]['logits_for_ood_eval'].squeeze().cpu().data.numpy())
         # print(all_logits.shape)
+
         if vis_prediction_results:
-            visualize_prediction_results(samples, results, output_dir, targets, False)
+            visualize_prediction_results(samples, results, output_dir, targets, json_data, dataset, ood = False)
         if 'savedet' in output_dir:
             os.makedirs(output_dir, exist_ok=True)
             for i, target in enumerate(targets):
@@ -377,7 +390,8 @@ def evaluate_ood_id(args, model, criterion, postprocessors, data_loader, base_ds
                 res_pano[i]["file_name"] = file_name
 
             panoptic_evaluator.update(res_pano)
-
+    json.dump(json_data, f)
+    f.close()
     # breakpoint()
     if not args.maha_train:
         np.save(address + 'id-logits.npy', all_logits)
@@ -457,7 +471,21 @@ def evaluate_ood_ood(model, criterion, postprocessors, data_loader, base_ds, dev
             data_loader.dataset.ann_folder,
             output_dir=os.path.join(output_dir, "panoptic_eval"),
         )
-    f = open(os.path.join(output_dir, 'DETR_Pascal_COCO.json'), 'w')
+    
+    if "coco" in dataset and "voc" in output_dir:
+        dataset_setting = "VOC_id_COCO_ood"
+    elif "openimages" in dataset and "voc" in output_dir:
+        dataset_setting = "VOC_id_OPENImages_ood"
+    elif "coco" in dataset and "bdd" in output_dir:
+        dataset_setting = "BDD_id_COCO_ood"
+    elif "openimages" in dataset and "bdd" in output_dir:
+        dataset_setting = "BDD_id_OPENImages_ood"
+        
+        
+    backbone_name = "DETR" if "siren" in output_dir else "FasterRCNN"
+    
+    f = open(os.path.join(output_dir, f'{backbone_name}_{dataset_setting}.json'), 'w')
+    
     json_data = {}
     for samples, targets in data_loader:#metric_logger.log_every(data_loader, 10, header):
         samples = samples.to(device) # what is the structure of samples, targets ?
@@ -535,7 +563,7 @@ def evaluate_ood_ood(model, criterion, postprocessors, data_loader, base_ds, dev
 
         # all_logits.append(results[0]['logits_for_ood_eval'].cpu().data.numpy())
         if vis_prediction_results:
-            visualize_prediction_results(samples, results, output_dir, targets, json_data, True)
+            visualize_prediction_results(samples, results, output_dir, targets, json_data, dataset, ood=True)
         continue
         loss_dict = criterion(outputs, targets)
         weight_dict = criterion.weight_dict

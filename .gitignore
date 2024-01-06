@@ -1,5 +1,6 @@
 */__pycache__/
 data/*
+detr/snapshots/
 detr/models/ops/build/*
 !data/README.md
 

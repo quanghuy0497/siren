@@ -120,7 +120,6 @@ class Backbone(BackboneBase):
             pretrained=pretrained, norm_layer=FrozenBatchNorm2d)
         # load the SwAV pre-training model from the url instead of supervised pre-training model
         if name == 'resnet50' and load_backbone == 'swav':
-            # print('hhh')
             checkpoint = torch.hub.load_state_dict_from_url('https://dl.fbaipublicfiles.com/deepcluster/swav_800ep_pretrain.pth.tar',map_location="cpu")
             state_dict = {k.replace("module.", ""): v for k, v in checkpoint.items()}
             backbone.load_state_dict(state_dict, strict=False)

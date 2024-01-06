@@ -260,5 +260,4 @@ def setup_config(args, random_seed=None, is_testing=False, ood=False):
             image_root_corruption_prefix=image_root_corruption_prefix)
         return cfg
     except AssertionError:
-        print('hhh')
         return cfg

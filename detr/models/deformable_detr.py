@@ -12,6 +12,7 @@ Deformable DETR model and criterion classes.
 """
 import torch
 import numpy as np
+import pdb
 import torch.nn.functional as F
 from torch import nn
 import math
@@ -187,8 +188,7 @@ class DeformableDETR(nn.Module): # This is the Deformable DETR module that perfo
         query_embeds = None
         if not self.two_stage:
             query_embeds = self.query_embed.weight#300,512
-        hs, init_reference, inter_references, enc_outputs_class, enc_outputs_coord_unact = self.transformer(srcs, masks,
-                                                                                                            pos,query_embeds)
+        hs, init_reference, inter_references, enc_outputs_class, enc_outputs_coord_unact = self.transformer(srcs, masks, pos, query_embeds)
         # hs : 6,1,300,256
         outputs_classes = []
         output_project_features = []
@@ -202,6 +202,7 @@ class DeformableDETR(nn.Module): # This is the Deformable DETR module that perfo
                 reference = inter_references[lvl - 1]
             reference = inverse_sigmoid(reference)
             outputs_class = self.class_embed[lvl](hs[lvl])
+
             if self.args.siren:
                 if lvl == hs.shape[0] - 1:
                     output_project_features.append(self.center_project(hs[lvl]))
@@ -517,7 +518,6 @@ class SetCriterion(nn.Module): #  This class computes the loss for DETR.
 
         idx = self._get_src_permutation_idx(indices)
         target_classes_o = torch.cat([t["labels"][J] for t, (_, J) in zip(targets, indices)])
-        # print('hhh',target_classes_o)
         target_classes = torch.full(src_logits.shape[:2], self.num_classes,
                                     dtype=torch.int64, device=src_logits.device)
         target_classes[idx] = target_classes_o
@@ -638,10 +638,11 @@ class PostProcess(nn.Module): # This module converts the model's output into the
 
         prob = out_logits.sigmoid()
         topk_indexes = torch.nonzero(prob.reshape(-1) > 0.1).view(1, -1)
-        scores = prob.reshape(-1)[topk_indexes[0]].view(1,-1)
-
+        
         topk_boxes = topk_indexes // (out_logits.shape[2])
+        scores = prob.reshape(-1)[topk_indexes[0]].view(1,-1)
         labels = topk_indexes % (out_logits.shape[2])
+        
         boxes = box_ops.box_cxcywh_to_xyxy(out_bbox)
         boxes1 = torch.gather(boxes, 1, topk_boxes.unsqueeze(-1).repeat(1,1,4))
         original_boxes = torch.gather(out_bbox, 1, topk_boxes.unsqueeze(-1).repeat(1,1,4))

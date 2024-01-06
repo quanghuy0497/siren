@@ -3,6 +3,7 @@ from matplotlib import pyplot as plt
 import os
 import numpy as np
 from util.box_ops import box_xyxy_to_cxcywh, box_cxcywh_to_xyxy
+import pdb
 
 # colors for visualization
 COLORS = [[0.000, 0.447, 0.741], [0.850, 0.325, 0.098], [0.929, 0.694, 0.125],
@@ -22,7 +23,7 @@ def plot_image(ax, img, norm):
     ax.imshow(img)
 
 
-def plot_results(pil_img, prob, boxes, output_dir, classes, targets, json_data, ood=False):
+def plot_results(pil_img, prob, boxes, output_dir, classes, targets, json_data, dataset, ood=False):
     plt.figure(figsize=(16, 10))
     # plt.imshow(pil_img)
     ax = plt.gca()
@@ -36,6 +37,8 @@ def plot_results(pil_img, prob, boxes, output_dir, classes, targets, json_data, 
         ax.add_patch(plt.Rectangle((xmin, ymin), xmax - xmin, ymax - ymin,
                                    fill=False, color=c, linewidth=3))
         # cl = p.argmax()
+
+
         text = f'{CLASSES[cl]}: {p:0.2f}'
         ax.text(xmin, ymin, text, fontsize=15,
                 bbox=dict(facecolor='yellow', alpha=0.5))
@@ -44,14 +47,14 @@ def plot_results(pil_img, prob, boxes, output_dir, classes, targets, json_data, 
     if prediction: 
         json_data[image_name] = prediction
     plt.axis('off')
-    # plt.show()
-    print('hhh')
 
-    if ood:
-        plt.savefig(os.path.join(output_dir + '/images_ood', f'img_{int(targets[0]["image_id"][0])}.jpg'))
-    else:
-        plt.savefig(os.path.join(output_dir + '/images', f'img_{int(targets[0]["image_id"][0])}.jpg'))
+    store_folder = f'images_ood_{dataset}' if ood else f'images_id_{dataset}'
+    
+    if not os.path.exists(output_dir + "/" + store_folder):
+        os.makedirs(output_dir + "/" + store_folder)
 
+    plt.savefig(os.path.join(output_dir + "/" + store_folder, f'img_{int(targets[0]["image_id"][0])}.jpg'))
+    
 
 def rescale_bboxes(out_bbox, size):
     img_w, img_h = size
@@ -60,9 +63,12 @@ def rescale_bboxes(out_bbox, size):
     # breakpoint()
     return b
 
-def visualize_prediction_results(samples, result, output_dir, targets, json_data, ood): #all images scale the smallest size to 800
+def visualize_prediction_results(samples, result, output_dir, targets, json_data, dataset, ood): #all images scale the smallest size to 800
     # breakpoint()
+
     probas = result[0]['scores']
+    classes = result[0]['labels']
+
     keep = probas > 0.5 # if probability is less than 0.5, then not predict. If not set this, a lot of bounding boxes are predicted. 
     #keep = probas > 0.0
     # breakpoint()
@@ -71,8 +77,10 @@ def visualize_prediction_results(samples, result, output_dir, targets, json_data
     bboxes_scaled = rescale_bboxes(result[0]['original_boxes'], list(images.shape[:2])[::-1])[keep]
     # bboxes_scaled = result[0]['boxes'][keep]
 
-    classes = result[0]['labels'][keep]
-    plot_results(images, probas[keep], bboxes_scaled,
-                 output_dir, classes, targets, json_data, ood)
+    classes = classes[keep]
+    probas = probas[keep]
+
+    plot_results(images, probas, bboxes_scaled,
+                 output_dir, classes, targets, json_data, dataset, ood)
     # breakpoint()
     return

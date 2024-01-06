@@ -119,7 +119,6 @@ class ProbabilisticVisualizer(Visualizer):
                 labels[i] = 'OOD'
             # color = assigned_colors[i]
             # if self.output.get_image() == '66523':
-            #     print('hhh')
             #     breakpoint()
             #     # continue
             # breakpoint()

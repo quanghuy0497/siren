@@ -204,6 +204,7 @@ def main(args):
             test_stats, coco_evaluator = evaluate(
                 model, criterion, postprocessors, data_loader_val, base_ds, device, args.output_dir, args.dataset, args
             )
+    print(output_dir)
 
     if args.eval:
         if 'ood' in args.dataset:
@@ -319,7 +320,7 @@ def get_datasets(args):
 
 def set_dataset_path(args):
     cur_dir = os.getcwd()
-    args.data_root = os.path.join(os.path.dirname(cur_dir), 'data')
+    args.data_root = os.path.join(os.path.dirname(os.path.dirname(cur_dir)), 'data')
     
     args.bdd_root = os.path.join(args.data_root, 'BDD_100k')
     # args.bdd_ann_root_train = 'os.path.join(args.bdd_root, train_bdd_converted.json)'

@@ -99,7 +99,6 @@ for index in range(3,4):
         sample_dict[i] = []
     for data in data_train:
         if int(data[-1]) == 10:
-            print('hhh')
             continue
 
         mean_class[int(data[-1])] += data[:-1]

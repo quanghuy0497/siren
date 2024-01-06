@@ -16,7 +16,6 @@ def covariance_output_to_cholesky(pred_bbox_cov):
     # import ipdb;
     # ipdb.set_trace()
     if pred_bbox_cov.shape[1] > 4:
-        # print('hhh')
         tril_indices = torch.tril_indices(row=4, col=4, offset=-1)
         predicted_cov_cholesky[:, tril_indices[0],
                                tril_indices[1]] = pred_bbox_cov[:, 4:]
