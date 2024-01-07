@@ -234,7 +234,7 @@ class ROIHeads(torch.nn.Module):
         # Get the corresponding GT for each proposal
         if has_gt:
             # breakpoint()
-            gt_classes = torch.zeros(gt_classes[matched_idxs].size()).cuda()
+            gt_classes = torch.zeros(gt_classes[matched_idxs].size()).to('cuda:1')
             # Label unmatched proposals (0 label from matcher) as background (label=num_classes)
             # coco_classes == 80.
             gt_classes[matched_labels == 0] = self.num_classes
@@ -542,8 +542,8 @@ class ROIHeadsLogisticGMMNew(ROIHeads):
                                     nn.ReLU(),
                                     nn.Linear(self.projection_dim, self.projection_dim),
                                     )
-        self.prototypes = torch.zeros((self.num_classes, self.projection_dim)).cuda()
-        self.learnable_kappa = nn.Linear(self.num_classes, 1, bias=False).cuda()
+        self.prototypes = torch.zeros((self.num_classes, self.projection_dim)).to('cuda:1')
+        self.learnable_kappa = nn.Linear(self.num_classes, 1, bias=False).to('cuda:1')
         nn.init.constant(self.learnable_kappa.weight, 10)
 
         # dismax
@@ -795,10 +795,10 @@ class ROIHeadsLogisticGMMNew(ROIHeads):
             gt_classes = (
                 cat([p.gt_classes for p in proposals], dim=0) if len(proposals) else torch.empty(0)
             )
-            gt_classes_filtered = gt_classes[gt_classes != self.num_classes].cuda()
+            gt_classes_filtered = gt_classes[gt_classes != self.num_classes].to('cuda:1')
 
-            projections_filtered = projections[gt_classes != self.num_classes].cuda()
-            # projections_filtered = box_features[gt_classes != self.num_classes].cuda()
+            projections_filtered = projections[gt_classes != self.num_classes].to('cuda:1')
+            # projections_filtered = box_features[gt_classes != self.num_classes].to('cuda:1')
 
             _log_classification_stats(scores, gt_classes)
             # self.sample_number = 10

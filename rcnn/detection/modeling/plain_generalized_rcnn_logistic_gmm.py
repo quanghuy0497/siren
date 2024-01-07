@@ -173,8 +173,8 @@ class GeneralizedRCNNLogisticGMM(nn.Module):
         #     proposal_losses[key] = 0.00001 * proposal_losses[key]
         losses.update(detector_losses)
         losses.update(proposal_losses)
-        # losses.update({'dummy': torch.zeros(1).cuda()})
-        # losses.update({'dummy': torch.zeros(1).cuda()})
+        # losses.update({'dummy': torch.zeros(1).to('cuda:1')})
+        # losses.update({'dummy': torch.zeros(1).to('cuda:1')})
         return losses
 
     def inference(

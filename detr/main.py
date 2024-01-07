@@ -283,26 +283,47 @@ def main(args):
 
 def get_datasets(args):
     if args.dataset == 'coco':
-        # dataset_train = build_dataset(image_set='train', args=args)
+        dataset_train = build_dataset(image_set='train', args=args)
         dataset_val = build_dataset(image_set='val', args=args)
     elif args.dataset == 'coco_pretrain':
         from datasets.selfdet import build_selfdet
         dataset_train = build_selfdet(
             'train', args=args, p=os.path.join(args.coco_path, 'train2017'))
         dataset_val = build_dataset(image_set='val', args=args)
+    elif args.dataset == 'airbus':
+        dataset_train = build_dataset(image_set='train', args=args)
+        dataset_val = build_dataset(image_set='val', args=args)
+    elif args.dataset == 'airbus_pretrain':
+        from datasets.selfdet import build_selfdet
+        dataset_train = build_selfdet(
+            'train', args=args, p=os.path.join(args.airbus_path, 'train_v2'))
+        dataset_val = build_dataset(image_set='val', args=args)
+    elif args.dataset == 'imagenet':
+        from datasets.selfdet import build_selfdet
+        dataset_train = build_selfdet(
+            'train', args=args, p=os.path.join(args.imagenet_path, 'train'))
+        dataset_val = build_dataset(image_set='val', args=args)
+    elif args.dataset == 'imagenet100':
+        from datasets.selfdet import build_selfdet
+        dataset_train = build_selfdet(
+            'train', args=args, p=os.path.join(args.imagenet100_path, 'train'))
+        dataset_val = build_dataset(image_set='val', args=args)
     elif args.dataset == 'voc':
         from datasets.torchvision_datasets.voc import VOCDetection
         from datasets.coco import make_coco_transforms
         if not args.maha_train:
-            dataset_train = VOCDetection(args.voc_path, ["2007", "2012"], image_sets=['trainval', 'trainval'], transforms=make_coco_transforms('val'), filter_pct=args.filter_pct)
-            dataset_val = VOCDetection(args.voc_path, ["2007"], image_sets=['test'], transforms=make_coco_transforms('val'))
+            dataset_train = VOCDetection(args.voc_path, ["2007", "2012"], image_sets=['trainval', 'trainval'],
+                                         transforms=make_coco_transforms('train'), filter_pct=args.filter_pct)
+            dataset_val = VOCDetection(args.voc_path, ["2007"], image_sets=[
+                                       'test'], transforms=make_coco_transforms('val'))
         else:
-            dataset_val = VOCDetection(args.voc_path, ["2007", "2012"], image_sets=['trainval', 'trainval'], transforms=make_coco_transforms('train'), filter_pct=args.filter_pct)
-            dataset_train = VOCDetection(args.voc_path, ["2007"], image_sets=['test'], transforms=make_coco_transforms('val')) 
-            # if we use flag --maha_train, then dataset_val and dataset_train change places with each other. 
+            dataset_val = VOCDetection(args.voc_path, ["2007", "2012"], image_sets=['trainval', 'trainval'],
+                                         transforms=make_coco_transforms('train'), filter_pct=args.filter_pct)
+            dataset_train = VOCDetection(args.voc_path, ["2007"], image_sets=[
+                'test'], transforms=make_coco_transforms('val'))
     elif args.dataset == 'bdd':
         if not args.maha_train:
-            dataset_train = build_dataset(image_set='val', args=args)
+            dataset_train = build_dataset(image_set='train', args=args)
             dataset_val = build_dataset(image_set='val', args=args)
         else:
             dataset_train = build_dataset(image_set='val', args=args)
@@ -327,11 +348,11 @@ def set_dataset_path(args):
     args.data_root = os.path.join(os.path.dirname(os.path.dirname(cur_dir)), 'data')
     
     args.bdd_root = os.path.join(args.data_root, 'BDD_100k')
-    # args.bdd_ann_root_train = 'os.path.join(args.bdd_root, train_bdd_converted.json)'
+    args.bdd_ann_root_train = os.path.join(args.bdd_root, 'train_bdd_converted.json')
     args.bdd_ann_root_test = os.path.join(args.bdd_root, 'val_bdd_converted.json')
     
-    args.open_root = os.path.join(args.data_root, 'OpenImages')
-    args.open_ann_root = os.path.join(args.open_root, 'COCO-Format/val_coco_format.json')
+    args.open_root = os.path.join(args.data_root, 'OpenImages/ood_classes_rm_overlap/images')
+    args.open_ann_root = os.path.join(args.data_root, 'OpenImages/ood_classes_rm_overlap/COCO-Format/val_coco_format.json')
     
     args.coco_path = os.path.join(args.data_root, 'COCO')
     

@@ -150,19 +150,19 @@ def make_coco_transforms(image_set):
 
     scales = [480, 512, 544, 576, 608, 640, 672, 704, 736, 768, 800]
 
-    # if image_set == 'train':
-    #     return T.Compose([
-    #         T.RandomHorizontalFlip(),
-    #         T.RandomSelect(
-    #             T.RandomResize(scales, max_size=1333),
-    #             T.Compose([
-    #                 T.RandomResize([400, 500, 600]),
-    #                 T.RandomSizeCrop(384, 600),
-    #                 T.RandomResize(scales, max_size=1333),
-    #             ])
-    #         ),
-    #         normalize,
-    #     ])
+    if image_set == 'train':
+        return T.Compose([
+            T.RandomHorizontalFlip(),
+            T.RandomSelect(
+                T.RandomResize(scales, max_size=1333),
+                T.Compose([
+                    T.RandomResize([400, 500, 600]),
+                    T.RandomSizeCrop(384, 600),
+                    T.RandomResize(scales, max_size=1333),
+                ])
+            ),
+            normalize,
+        ])
 
     if image_set == 'val':
         return T.Compose([
@@ -173,29 +173,29 @@ def make_coco_transforms(image_set):
     raise ValueError(f'unknown {image_set}')
 
 
-def build(image_set, args): # image_set: "train" or "val"
-    root = Path(args.coco_path) # /app/COCO_DATASET_ROOT
+def build(image_set, args):
+    root = Path(args.coco_path)
     assert root.exists(), f'provided COCO path {root} does not exist'
     mode = 'instances'
     bdd=False
-    if args.dataset == 'coco_ood_val':              # COCO as OOD, VOC as ID
+    if args.dataset == 'coco_ood_val':
         PATHS = {
-            # "train": (root / "train2017", root / "annotations" / f'{mode}_train2017.json'),
-            "val": (root / "val2017", root / "annotations" / f'{mode}_val2017_ood_wrt_voc_rm_overlap.json'),
+            "train": (root / "train2017", root / "annotations" / f'{mode}_train2017.json'),
+            "val": (root / "val2017", root / "annotations" / f'{mode}_val2017_ood_rm_overlap.json'),
         }
-    elif args.dataset == 'coco_ood_val_bdd':            # COCO as OOD, BDD as ID
+    elif args.dataset == 'coco_ood_val_bdd':
         PATHS = {
-            # "train": (root / "train2017", root / "annotations" / f'{mode}_train2017.json'),
+            "train": (root / "train2017", root / "annotations" / f'{mode}_train2017.json'),
             "val": (root / "val2017", root / "annotations" / f'{mode}_val2017_ood_wrt_bdd_rm_overlap.json'),
         }
     elif args.dataset == 'openimages_ood_val':
         PATHS = {
-            # "train": (root / "train2017", root / "annotations" / f'{mode}_train2017.json'),
+            "train": (root / "train2017", root / "annotations" / f'{mode}_train2017.json'),
             "val": (args.open_root, args.open_ann_root),
         }
     elif args.dataset == 'bdd':
         PATHS = {
-            # "train": (Path(args.bdd_root) / "train", args.bdd_ann_root_train),
+            "train": (Path(args.bdd_root) / "train", args.bdd_ann_root_train),
             # "train" :(Path(args.bdd_root) / "train",
             #           '/nobackup-slow/dataset/my_xfdu/bdd-100k/bdd100k/labels/det_20/train_converted.json' ),
             "val": (Path(args.bdd_root) /  "val", args.bdd_ann_root_test),
@@ -213,8 +213,8 @@ def build(image_set, args): # image_set: "train" or "val"
     if 'coco' not in args.dataset and 'bdd' not in args.dataset and 'open' not in args.dataset:
         no_cats = True
     filter_pct = -1
-    # if image_set == 'train' and args.filter_pct > 0:
-        # filter_pct = args.filter_pct
+    if image_set == 'train' and args.filter_pct > 0:
+        filter_pct = args.filter_pct
     dataset = CocoDetection(img_folder, ann_file, transforms=make_coco_transforms(image_set), return_masks=args.masks,
                             cache_mode=args.cache_mode, local_rank=get_local_rank(), local_size=get_local_size(), no_cats=no_cats, filter_pct=filter_pct, bdd=bdd)
     return dataset

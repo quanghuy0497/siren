@@ -294,7 +294,7 @@ def get_matched_results_dicts(config_names,
                             iou_correct)))[0]
 
                 matched_results = torch.load(
-                    dictionary_file_name, map_location='cuda')
+                    dictionary_file_name, map_location='cuda:1')
             elif image_corruption_level == 'OpenIm':
                 args.image_corruption_level = 0
                 args.test_dataset = test_dataset_open_images if image_corruption_level == 'OpenIm' else test_dataset_open_images_odd
@@ -310,7 +310,7 @@ def get_matched_results_dicts(config_names,
                             iou_min,
                             iou_correct)))[0]
                 matched_results = torch.load(
-                    dictionary_file_name, map_location='cuda')
+                    dictionary_file_name, map_location='cuda:1')
             else:
                 args.image_corruption_level = 0
                 args.test_dataset = test_dataset_open_images if image_corruption_level == 'OpenIm' else test_dataset_open_images_odd
@@ -324,7 +324,7 @@ def get_matched_results_dicts(config_names,
                         inference_output_dir,
                         "preprocessed_predicted_instances_odd_*.pth"))[0]
                 preprocessed_predicted_instances = torch.load(
-                    dictionary_file_name, map_location='cuda')
+                    dictionary_file_name, map_location='cuda:1')
 
                 predicted_boxes = preprocessed_predicted_instances['predicted_boxes']
                 predicted_cov_mats = preprocessed_predicted_instances['predicted_covar_mats']
@@ -377,20 +377,20 @@ def get_matched_results_dicts(config_names,
                     1e-2 *
                     torch.eye(all_results_covs.shape[2]).to('cpu'))
                 predicted_multivariate_normal_dists.loc = predicted_multivariate_normal_dists.loc.to(
-                    'cuda')
+                    'cuda:1')
                 predicted_multivariate_normal_dists.scale_tril = predicted_multivariate_normal_dists.scale_tril.to(
-                    'cuda')
+                    'cuda:1')
                 predicted_multivariate_normal_dists._unbroadcasted_scale_tril = predicted_multivariate_normal_dists._unbroadcasted_scale_tril.to(
-                    'cuda')
+                    'cuda:1')
                 predicted_multivariate_normal_dists.covariance_matrix = predicted_multivariate_normal_dists.covariance_matrix.to(
-                    'cuda')
+                    'cuda:1')
                 predicted_multivariate_normal_dists.precision_matrix = predicted_multivariate_normal_dists.precision_matrix.to(
-                    'cuda')
+                    'cuda:1')
                 all_entropy = predicted_multivariate_normal_dists.entropy()
 
                 all_log_prob = -predicted_multivariate_normal_dists.log_prob(all_gt_means)
                 # Energy Score.
-                sample_set = predicted_multivariate_normal_dists.sample((3,)).to('cuda')
+                sample_set = predicted_multivariate_normal_dists.sample((3,)).to('cuda:1')
                 sample_set_1 = sample_set[:-1]
                 sample_set_2 = sample_set[1:]
 
@@ -418,7 +418,7 @@ def get_matched_results_dicts(config_names,
                          matched_results['localization_errors']['iou_with_ground_truth'][:, 0],
                          matched_results['duplicates']['iou_with_ground_truth'],
                          torch.zeros(
-                            matched_results['false_positives']['predicted_box_means'].shape[0]).to('cuda')*np.NaN)).cpu().numpy())
+                            matched_results['false_positives']['predicted_box_means'].shape[0]).to('cuda:1')*np.NaN)).cpu().numpy())
 
                 predicted_multivariate_normal_dists = torch.distributions.multivariate_normal.MultivariateNormal(
                     matched_results['false_positives']['predicted_box_means'].to('cpu'),
@@ -426,15 +426,15 @@ def get_matched_results_dicts(config_names,
                     1e-2 *
                     torch.eye(matched_results['false_positives']['predicted_box_covariances'].shape[2]).to('cpu'))
                 predicted_multivariate_normal_dists.loc = predicted_multivariate_normal_dists.loc.to(
-                    'cuda')
+                    'cuda:1')
                 predicted_multivariate_normal_dists.scale_tril = predicted_multivariate_normal_dists.scale_tril.to(
-                    'cuda')
+                    'cuda:1')
                 predicted_multivariate_normal_dists._unbroadcasted_scale_tril = predicted_multivariate_normal_dists._unbroadcasted_scale_tril.to(
-                    'cuda')
+                    'cuda:1')
                 predicted_multivariate_normal_dists.covariance_matrix = predicted_multivariate_normal_dists.covariance_matrix.to(
-                    'cuda')
+                    'cuda:1')
                 predicted_multivariate_normal_dists.precision_matrix = predicted_multivariate_normal_dists.precision_matrix.to(
-                    'cuda')
+                    'cuda:1')
                 FP_Entropy = predicted_multivariate_normal_dists.entropy()
                 res_dict_clean[config_name][image_corruption_level]['FP_Entropy'].extend(
                     FP_Entropy.cpu().numpy())
@@ -461,39 +461,39 @@ def get_matched_results_dicts(config_names,
                              matched_results['localization_errors']['is_truncated'],
                              matched_results['duplicates']['is_truncated'],
                              torch.full((
-                                matched_results['false_positives']['predicted_box_means'].shape[0],), -1, dtype=torch.float32).to('cuda')*np.NaN)).cpu().numpy())
+                                matched_results['false_positives']['predicted_box_means'].shape[0],), -1, dtype=torch.float32).to('cuda:1')*np.NaN)).cpu().numpy())
                     res_dict_clean[config_name][image_corruption_level]['Occluded'].extend(
                         torch.cat(
                             (matched_results['true_positives']['is_occluded'],
                              matched_results['localization_errors']['is_occluded'],
                              matched_results['duplicates']['is_occluded'],
                              torch.full((
-                                matched_results['false_positives']['predicted_box_means'].shape[0],), -1, dtype=torch.float32).to('cuda')*np.NaN)).cpu().numpy())
+                                matched_results['false_positives']['predicted_box_means'].shape[0],), -1, dtype=torch.float32).to('cuda:1')*np.NaN)).cpu().numpy())
                 else:
                     res_dict_clean[config_name][image_corruption_level]['Truncated'].extend(
                         torch.cat(
                             (torch.full((
-                                matched_results['true_positives']['predicted_box_means'].shape[0],), -1, dtype=torch.float32).to('cuda')*np.NaN,
+                                matched_results['true_positives']['predicted_box_means'].shape[0],), -1, dtype=torch.float32).to('cuda:1')*np.NaN,
                              torch.full((
                                  matched_results['localization_errors']['predicted_box_means'].shape[0],), -1,
-                                 dtype=torch.float32).to('cuda'),
+                                 dtype=torch.float32).to('cuda:1'),
                              torch.full((
                                  matched_results['duplicates']['predicted_box_means'].shape[0],), -1,
-                                 dtype=torch.float32).to('cuda'),
+                                 dtype=torch.float32).to('cuda:1'),
                              torch.full((
-                                matched_results['false_positives']['predicted_box_means'].shape[0],), -1, dtype=torch.float32).to('cuda')*np.NaN)).cpu().numpy())
+                                matched_results['false_positives']['predicted_box_means'].shape[0],), -1, dtype=torch.float32).to('cuda:1')*np.NaN)).cpu().numpy())
                     res_dict_clean[config_name][image_corruption_level]['Occluded'].extend(
                         torch.cat(
                             (torch.full((
-                                matched_results['true_positives']['predicted_box_means'].shape[0],), -1, dtype=torch.float32).to('cuda')*np.NaN,
+                                matched_results['true_positives']['predicted_box_means'].shape[0],), -1, dtype=torch.float32).to('cuda:1')*np.NaN,
                              torch.full((
                                  matched_results['localization_errors']['predicted_box_means'].shape[0],), -1,
-                                 dtype=torch.float32).to('cuda')*np.NaN,
+                                 dtype=torch.float32).to('cuda:1')*np.NaN,
                              torch.full((
                                  matched_results['duplicates']['predicted_box_means'].shape[0],), -1,
-                                 dtype=torch.float32).to('cuda')*np.NaN,
+                                 dtype=torch.float32).to('cuda:1')*np.NaN,
                              torch.full((
-                                matched_results['false_positives']['predicted_box_means'].shape[0],), -1, dtype=torch.float32).to('cuda')*np.NaN)).cpu().numpy())
+                                matched_results['false_positives']['predicted_box_means'].shape[0],), -1, dtype=torch.float32).to('cuda:1')*np.NaN)).cpu().numpy())
             else:
                 predicted_multivariate_normal_dists = torch.distributions.multivariate_normal.MultivariateNormal(
                     matched_results['predicted_box_means'].to('cpu'),
@@ -501,15 +501,15 @@ def get_matched_results_dicts(config_names,
                     1e-2 *
                     torch.eye(matched_results['predicted_box_covariances'].shape[2]).to('cpu'))
                 predicted_multivariate_normal_dists.loc = predicted_multivariate_normal_dists.loc.to(
-                    'cuda')
+                    'cuda:1')
                 predicted_multivariate_normal_dists.scale_tril = predicted_multivariate_normal_dists.scale_tril.to(
-                    'cuda')
+                    'cuda:1')
                 predicted_multivariate_normal_dists._unbroadcasted_scale_tril = predicted_multivariate_normal_dists._unbroadcasted_scale_tril.to(
-                    'cuda')
+                    'cuda:1')
                 predicted_multivariate_normal_dists.covariance_matrix = predicted_multivariate_normal_dists.covariance_matrix.to(
-                    'cuda')
+                    'cuda:1')
                 predicted_multivariate_normal_dists.precision_matrix = predicted_multivariate_normal_dists.precision_matrix.to(
-                    'cuda')
+                    'cuda:1')
                 all_entropy = predicted_multivariate_normal_dists.entropy()
                 res_dict_clean[config_name][image_corruption_level]['FP_Entropy'].extend(
                     all_entropy.cpu().numpy())

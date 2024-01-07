@@ -13,7 +13,7 @@ CLASSES_VOC = ["aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "
     "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person",
     "pottedplant", "sheep", "sofa", "train", "tvmonitor"]
 
-CLASSES_BDD = ['N/A', 'pedestrian', 'rider', 'car', 'truck', 'bus', 'train', 'motorcycle', 'bicycle', 'traffic light', 'traffic sign']#, "OOD"]
+CLASSES_BDD = ['pedestrian', 'rider', 'car', 'truck', 'bus', 'train', 'motorcycle', 'bicycle', 'traffic light', 'traffic sign', "OOD"]
 
 def plot_image(ax, img, norm):
     if norm:
@@ -52,13 +52,14 @@ def plot_results(pil_img, prob, boxes, output_dir, classes, targets, json_data, 
         json_data[original_file_name] = prediction
     plt.axis('off')
 
-    store_folder = f'images_ood_{dataset}' if ood else f'images_id_{dataset}'
+    store_folder = f'images_{dataset}' if ood else f'images_{dataset}'
     
     if not os.path.exists(output_dir + "/" + store_folder):
         os.makedirs(output_dir + "/" + store_folder)
 
     plt.savefig(os.path.join(output_dir + "/" + store_folder, original_file_name))
-    
+    plt.close()
+    return json_data
 
 def rescale_bboxes(out_bbox, size):
     img_w, img_h = size
@@ -88,4 +89,4 @@ def visualize_prediction_results(samples, result, output_dir, targets, json_data
     plot_results(images, probas, bboxes_scaled,
                  output_dir, classes, targets, json_data, dataset, original_file_name, ood)
     # breakpoint()
-    return
+    return json_data
