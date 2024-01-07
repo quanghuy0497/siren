@@ -12,7 +12,6 @@ Deformable DETR model and criterion classes.
 """
 import torch
 import numpy as np
-import pdb
 import torch.nn.functional as F
 from torch import nn
 import math
@@ -29,7 +28,7 @@ def _get_clones(module, N):
     return nn.ModuleList([copy.deepcopy(module) for i in range(N)])
 
 
-class DeformableDETR(nn.Module): # This is the Deformable DETR module that performs object detection
+class DeformableDETR(nn.Module):
     """ This is the Deformable DETR module that performs object detection """
     def __init__(self, backbone, transformer, num_classes, num_queries, num_feature_levels,
                  aux_loss=True, with_box_refine=False, two_stage=False, object_embedding_loss=False,
@@ -111,7 +110,7 @@ class DeformableDETR(nn.Module): # This is the Deformable DETR module that perfo
             nn.init.xavier_uniform_(proj[0].weight, gain=1)
             nn.init.constant_(proj[0].bias, 0)
 
-        if self.args.siren: # add siren to DETR
+        if self.args.siren:
             self.learnable_kappa = nn.Linear(num_classes,1, bias=False).to('cuda:1')
             torch.nn.init.constant_(self.learnable_kappa.weight, self.args.learnable_kappa_init)
         # if two-stage, the last class_embed and bbox_embed is for region proposal generation
@@ -188,7 +187,8 @@ class DeformableDETR(nn.Module): # This is the Deformable DETR module that perfo
         query_embeds = None
         if not self.two_stage:
             query_embeds = self.query_embed.weight#300,512
-        hs, init_reference, inter_references, enc_outputs_class, enc_outputs_coord_unact = self.transformer(srcs, masks, pos, query_embeds)
+        hs, init_reference, inter_references, enc_outputs_class, enc_outputs_coord_unact = self.transformer(srcs, masks,
+                                                                                                            pos,query_embeds)
         # hs : 6,1,300,256
         outputs_classes = []
         output_project_features = []
@@ -202,7 +202,6 @@ class DeformableDETR(nn.Module): # This is the Deformable DETR module that perfo
                 reference = inter_references[lvl - 1]
             reference = inverse_sigmoid(reference)
             outputs_class = self.class_embed[lvl](hs[lvl])
-
             if self.args.siren:
                 if lvl == hs.shape[0] - 1:
                     output_project_features.append(self.center_project(hs[lvl]))
@@ -260,7 +259,7 @@ class DeformableDETR(nn.Module): # This is the Deformable DETR module that perfo
                     for a, b in zip(outputs_class[:-1], outputs_coord[:-1])]  # , outputs_features[:-1])]
 
 
-class SetCriterion(nn.Module): #  This class computes the loss for DETR.
+class SetCriterion(nn.Module):
     """ This class computes the loss for DETR.
     The process happens in two steps:
         1) we compute hungarian assignment between ground truth boxes and the outputs of the model
@@ -518,6 +517,7 @@ class SetCriterion(nn.Module): #  This class computes the loss for DETR.
 
         idx = self._get_src_permutation_idx(indices)
         target_classes_o = torch.cat([t["labels"][J] for t, (_, J) in zip(targets, indices)])
+        # print('hhh',target_classes_o)
         target_classes = torch.full(src_logits.shape[:2], self.num_classes,
                                     dtype=torch.int64, device=src_logits.device)
         target_classes[idx] = target_classes_o
@@ -612,7 +612,7 @@ class SetCriterion(nn.Module): #  This class computes the loss for DETR.
         return losses
 
 
-class PostProcess(nn.Module): # This module converts the model's output into the format expected by the coco api
+class PostProcess(nn.Module):
     """ This module converts the model's output into the format expected by the coco api"""
 
     @torch.no_grad()
@@ -642,8 +642,6 @@ class PostProcess(nn.Module): # This module converts the model's output into the
 
         topk_boxes = topk_indexes // (out_logits.shape[2])
         labels = topk_indexes % (out_logits.shape[2])
-        
-        
         boxes = box_ops.box_cxcywh_to_xyxy(out_bbox)
         boxes1 = torch.gather(boxes, 1, topk_boxes.unsqueeze(-1).repeat(1,1,4))
         original_boxes = torch.gather(out_bbox, 1, topk_boxes.unsqueeze(-1).repeat(1,1,4))
@@ -677,7 +675,7 @@ class PostProcess(nn.Module): # This module converts the model's output into the
 
 
     @torch.no_grad()
-    def forward_maha(self, outputs, targets, target_sizes):# only being used in evaluate_ood_id
+    def forward_maha(self, outputs, targets, target_sizes):
         """ Perform the computation
         Parameters:
             outputs: raw outputs of the model
