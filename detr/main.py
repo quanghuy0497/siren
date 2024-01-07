@@ -347,9 +347,9 @@ def set_dataset_path(args):
     cur_dir = os.getcwd()
     args.data_root = os.path.join(os.path.dirname(os.path.dirname(cur_dir)), 'data')
     
-    args.bdd_root = os.path.join(args.data_root, 'BDD_100k')
-    args.bdd_ann_root_train = os.path.join(args.bdd_root, 'train_bdd_converted.json')
-    args.bdd_ann_root_test = os.path.join(args.bdd_root, 'val_bdd_converted.json')
+    args.bdd_root = os.path.join(args.data_root, 'BDD_100k/images')
+    args.bdd_ann_root_train = os.path.join(args.data_root, 'BDD_100k/train_bdd_converted.json')
+    args.bdd_ann_root_test = os.path.join(args.data_root, 'BDD_100k/val_bdd_converted.json')
     
     args.open_root = os.path.join(args.data_root, 'OpenImages/ood_classes_rm_overlap/images')
     args.open_ann_root = os.path.join(args.data_root, 'OpenImages/ood_classes_rm_overlap/COCO-Format/val_coco_format.json')

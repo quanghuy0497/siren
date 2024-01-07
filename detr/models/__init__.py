@@ -39,6 +39,7 @@ def build_model(args):
     else:
         num_classes = 20
     # num_classes += 1
+    print("Num classes: %d" % num_classes)
     device = torch.device(args.device)
 
     weight_dict = {'loss_ce': args.cls_loss_coef, 'loss_bbox': args.bbox_loss_coef,
