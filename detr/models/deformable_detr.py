@@ -111,7 +111,7 @@ class DeformableDETR(nn.Module):
             nn.init.constant_(proj[0].bias, 0)
 
         if self.args.siren:
-            self.learnable_kappa = nn.Linear(num_classes,1, bias=False).to('cuda:1')
+            self.learnable_kappa = nn.Linear(num_classes,1, bias=False).to('cuda:0')
             torch.nn.init.constant_(self.learnable_kappa.weight, self.args.learnable_kappa_init)
         # if two-stage, the last class_embed and bbox_embed is for region proposal generation
         num_pred = (transformer.decoder.num_layers + 1) if two_stage else transformer.decoder.num_layers
@@ -276,7 +276,7 @@ class SetCriterion(nn.Module):
         """
         super().__init__()
         self.num_classes = num_classes
-        self.empty_weight = torch.ones(self.num_classes).to('cuda:1')
+        self.empty_weight = torch.ones(self.num_classes).to('cuda:0')
         self.empty_weight[-1] = 0.1
         self.matcher = matcher
         self.weight_dict = weight_dict
@@ -284,9 +284,9 @@ class SetCriterion(nn.Module):
         self.focal_alpha = focal_alpha
         self.ce = torch.nn.CrossEntropyLoss()
         self.args = args
-        self.criterion = torch.nn.CrossEntropyLoss().to('cuda:1')
+        self.criterion = torch.nn.CrossEntropyLoss().to('cuda:0')
         self.prototypes = torch.zeros(self.num_classes,
-                                                  self.args.project_dim).to('cuda:1')
+                                                  self.args.project_dim).to('cuda:0')
 
     def weighted_vmf_loss(self, pred, weight_before_exp, target):
         center_adpative_weight = weight_before_exp.view(1,-1)
@@ -366,17 +366,17 @@ class SetCriterion(nn.Module):
 
             else:
                 print(idx)
-                loss_dummy = (outputs['project_head'](torch.zeros(1,256).to('cuda:1'))- \
-                              outputs['project_head'](torch.zeros(1,256).to('cuda:1')))**2
+                loss_dummy = (outputs['project_head'](torch.zeros(1,256).to('cuda:0'))- \
+                              outputs['project_head'](torch.zeros(1,256).to('cuda:0')))**2
 
                 loss_ce = sigmoid_focal_loss(src_logits, target_classes_onehot, num_boxes,
                                              alpha=self.focal_alpha,
                                              gamma=2) * src_logits.shape[1]
                 loss_dummy_lk = (outputs['learnable_kappa'](
-                    torch.zeros(1, self.num_classes).to('cuda:1')) -
+                    torch.zeros(1, self.num_classes).to('cuda:0')) -
                                  outputs[
                     'learnable_kappa'](torch.zeros(
-                                         1, self.num_classes).to('cuda:1'))) ** 2
+                                         1, self.num_classes).to('cuda:0'))) ** 2
 
                 losses = {'loss_ce': loss_ce,
                           'loss_vmf': loss_dummy.sum() \
@@ -436,7 +436,7 @@ class SetCriterion(nn.Module):
     def loss(self, z1, z2):  # BxNxD
         x = torch.einsum('ijd,icd->ijc', z1, z2)
         # x = torch.einsum('bnd,bnd->bnn', z1, z2)
-        labels = torch.arange(0, x.shape[1]).view(1, x.shape[1]).repeat_interleave(x.shape[0], 0).to('cuda:1')
+        labels = torch.arange(0, x.shape[1]).view(1, x.shape[1]).repeat_interleave(x.shape[0], 0).to('cuda:0')
         # return self.ce(x[:, :1].squeeze(1), labels[:, :1].squeeze(1))
         return self.ce(x.flatten(0, 1), labels.flatten(0, 1))
 

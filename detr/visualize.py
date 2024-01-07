@@ -13,7 +13,7 @@ CLASSES_VOC = ["aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "
     "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person",
     "pottedplant", "sheep", "sofa", "train", "tvmonitor"]
 
-CLASSES_BDD = ['pedestrian', 'rider', 'car', 'truck', 'bus', 'train', 'motorcycle', 'bicycle', 'traffic light', 'traffic sign', "OOD"]
+CLASSES_BDD = ['pedestrian', 'rider', 'car', 'truck', 'bus', 'train', 'motorcycle', 'bicycle', 'traffic light', 'traffic sign']
 
 def plot_image(ax, img, norm):
     if norm:
@@ -42,6 +42,8 @@ def plot_results(pil_img, prob, boxes, output_dir, classes, targets, json_data, 
         ax.add_patch(plt.Rectangle((xmin, ymin), xmax - xmin, ymax - ymin,
                                    fill=False, color=c, linewidth=3))
         # cl = p.argmax()
+        if 'bdd' in output_dir:
+            cl -= 1
 
         text = f'{CLASSES[cl]}: {p:0.2f}'
         ax.text(xmin, ymin, text, fontsize=15,

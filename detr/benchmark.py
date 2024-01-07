@@ -51,12 +51,12 @@ def benchmark():
     assert args.resume is None or os.path.exists(args.resume)
     dataset = build_dataset('val', main_args)
     model, _, _ = build_model(main_args)
-    model.to('cuda:1')
+    model.to('cuda:0')
     model.eval()
     if args.resume is not None:
         ckpt = torch.load(args.resume, map_location=lambda storage, loc: storage)
         model.load_state_dict(ckpt['model'])
-    inputs = nested_tensor_from_tensor_list([dataset.__getitem__(0)[0].to('cuda:1') for _ in range(args.batch_size)])
+    inputs = nested_tensor_from_tensor_list([dataset.__getitem__(0)[0].to('cuda:0') for _ in range(args.batch_size)])
     t = measure_average_inference_time(model, inputs, args.num_iters, args.warm_iters)
     return 1.0 / t * args.batch_size
 

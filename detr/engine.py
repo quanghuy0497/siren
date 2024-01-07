@@ -16,6 +16,7 @@ import sys
 from typing import Iterable
 import json
 import pdb
+import numpy as np
 import torch
 import util.misc as utils
 from datasets.coco_eval import CocoEvaluator
@@ -308,7 +309,7 @@ def evaluate_ood_id(args, model, criterion, postprocessors, data_loader, base_ds
             continue
         if dataset == 'bdd':
             results[0]['labels'] += 1
-        import numpy as np
+        
         # print(results[0]['logits_for_ood_eval'].shape)
         if all_logits is None:
             all_logits = results[0]['logits_for_ood_eval'].view(-1,
@@ -478,7 +479,7 @@ def evaluate_ood_ood(model, criterion, postprocessors, data_loader, base_ds, dev
     if "coco" in dataset and "voc" in output_dir:
         dataset_setting = "VOC_id_COCO_ood"
     elif "openimages" in dataset and "voc" in output_dir:
-        dataset_setting = "VOC_id_OPENImages_ood"
+        dataset_setting = "VOC_id_OpenImages_ood"
     elif "coco" in dataset and "bdd" in output_dir:
         dataset_setting = "BDD_id_COCO_ood"
     elif "openimages" in dataset and "bdd" in output_dir:
