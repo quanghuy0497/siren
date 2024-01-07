@@ -248,8 +248,17 @@ If you found any part of this code is useful in your research, please consider c
 Command for running, but please modify it depending on the setting:
 
 ```
-GPUS_PER_NODE=1./tools/run_dist_launch.sh 1 ./configs/voc/siren.sh coco_ood --resume checkpoint/checkpoint_voc_siren.pth --eval --viz_prediction_results
+./configs/voc/siren.sh voc_id --resume checkpoint/checkpoint_voc_siren.pth --eval --viz_prediction_results
+./configs/voc/siren.sh coco_ood --resume checkpoint/checkpoint_voc_siren.pth --eval --viz_prediction_results
+./configs/voc/siren.sh openimages_ood --resume checkpoint/checkpoint_voc_siren.pth --eval --viz_prediction_results
+
+./configs/bbd/siren.sh bdd_id --resume checkpoint/checkpoint_bbd_siren.pth --eval --viz_prediction_results
+./configs/bbd/siren.sh coco_ood --resume checkpoint/checkpoint_bbd_siren.pth --eval --viz_prediction_results
+./configs/bbd/siren.sh openimages_ood --resume checkpoint/checkpoint_bdd_siren.pth --eval --viz_prediction_results
+
 ```
+
+If you want to run on a particular gpu, then replace all `.device('gpu:<gpu_id>')`, such as `.device('gpu:0)`. 
 
 If you cannot run script file under `.\`, such as `.\siren.sh` (error `permission denide`), please run `chmod u+x example.sh`
 
