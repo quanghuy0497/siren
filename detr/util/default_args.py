@@ -134,7 +134,7 @@ def get_args_parser():
     parser.add_argument('--cache_path', default=None, help='where to store the cache')
     parser.add_argument('--device', default='cuda:0',
                         help='device to use for training / testing')
-    parser.add_argument('--seed', default=42, type=int)
+    parser.add_argument('--seed', default=4040, type=int)
     parser.add_argument('--resume', default='', help='resume from checkpoint')
     parser.add_argument('--random_seed', action='store_true')
     parser.add_argument('--eval_every', default=1, type=int)

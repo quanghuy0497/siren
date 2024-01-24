@@ -243,7 +243,7 @@ def evaluate_ood_id(args, model, criterion, postprocessors, data_loader, base_ds
         
     backbone_name = "DETR" if "siren" in output_dir else "FasterRCNN"
     
-    f = open(os.path.join(output_dir, f'{backbone_name}_{dataset_setting}.json'), 'w')
+    f = open(os.path.join(output_dir, f'{backbone_name}_{dataset_setting}_0.5.json'), 'w')
     json_data = {}
     
 
@@ -488,7 +488,7 @@ def evaluate_ood_ood(model, criterion, postprocessors, data_loader, base_ds, dev
         
     backbone_name = "DETR" if "siren" in output_dir else "FasterRCNN"
     
-    f = open(os.path.join(output_dir, f'{backbone_name}_{dataset_setting}.json'), 'w')
+    f = open(os.path.join(output_dir, f'{backbone_name}_{dataset_setting}_0.5.json'), 'w')
     
     json_data = {}
     for samples, targets, original_file_name in metric_logger.log_every(data_loader, 10, header):
