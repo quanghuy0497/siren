@@ -352,7 +352,7 @@ def set_dataset_path(args):
     args.bdd_ann_root_train = os.path.join(args.data_root, 'BDD_100k/train_bdd_converted.json')
     args.bdd_ann_root_test = os.path.join(args.data_root, 'BDD_100k/val_bdd_converted.json')
     
-    args.open_root = os.path.join(args.data_root, 'OpenImages/ood_classes_rm_overlap/testing_img_2')
+    args.open_root = os.path.join(args.data_root, 'OpenImages/ood_classes_rm_overlap/images')
     args.open_ann_root = os.path.join(args.data_root, 'OpenImages/ood_classes_rm_overlap/COCO-Format/val_coco_format.json')
     
     args.coco_path = os.path.join(args.data_root, 'COCO')

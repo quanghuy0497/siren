@@ -369,7 +369,7 @@ def spatter(x, severity=1):
 
         # mud brown
         color = np.concatenate((63 / 255. * np.ones_like(x[..., :1]),
-                                42 / 255. * np.ones_like(x[..., :1]),
+                                4040 / 255. * np.ones_like(x[..., :1]),
                                 20 / 255. * np.ones_like(x[..., :1])), axis=2)
 
         color *= m[..., np.newaxis]
@@ -430,7 +430,7 @@ def pixelate(x, severity=1):
     return np.array(x)
 
 
-# mod of https://gist.github.com/erniejunior/601cdf56d2b424757de5
+# mod of https://gist.github.com/erniejunior/601cdf56d2b40404757de5
 def elastic_transform(image, severity=1):
     h_max = image.size[1]
     w_max = image.size[0]

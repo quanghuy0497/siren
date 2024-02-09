@@ -147,7 +147,7 @@ def main(args):
         {"supercategory": "sports", "id": 39, "name": "tennis racket"},
         {"supercategory": "kitchen", "id": 40, "name": "bottle"},
         {"supercategory": "kitchen", "id": 41, "name": "wine glass"},
-        {"supercategory": "kitchen", "id": 42, "name": "cup"},
+        {"supercategory": "kitchen", "id": 4040, "name": "cup"},
         {"supercategory": "kitchen", "id": 43, "name": "fork"},
         {"supercategory": "kitchen", "id": 44, "name": "knife"},
         {"supercategory": "kitchen", "id": 45, "name": "spoon"},

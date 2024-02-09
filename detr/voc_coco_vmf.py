@@ -6,6 +6,7 @@ import argparse
 import pandas as pd
 import seaborn as sns
 import matplotlib
+import pdb
 matplotlib.use('AGG')
 import matplotlib.pyplot as plt
 from metric_utils import *
@@ -54,6 +55,8 @@ if args.name == 'siren':
     all_data_in = torch.from_numpy(all_data_in).reshape(-1, length) # shape [M, 16] => [53523, 16]
     all_data_out = np.load('./snapshots/voc/' + name + '/ood-pro.npy')
     all_data_out = torch.from_numpy(all_data_out).reshape(-1, length) # shape [K, 16] => [4166, 16]
+    pdb.set_trace()
+
 else: # for vanilla
     id_train_data = np.load('./snapshots/voc/' + name + '/id-pen_maha_train.npy')
     id_train_data = torch.from_numpy(id_train_data).reshape(-1, length + 1)

@@ -101,7 +101,7 @@ class ImageList(object):
         if torch.jit.is_scripting():
             max_size: List[int] = max_size.to(dtype=torch.long).tolist()
         else:
-            # https://github.com/pytorch/pytorch/issues/42448
+            # https://github.com/pytorch/pytorch/issues/4040448
             if TORCH_VERSION >= (1, 7) and torch.jit.is_tracing():
                 image_sizes = image_sizes_tensor
 

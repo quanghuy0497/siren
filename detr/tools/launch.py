@@ -99,7 +99,7 @@ will not pass ``--local_rank`` when you specify this flag.
     ``local_rank`` is NOT globally unique: it is only unique per process
     on a machine.  Thus, don't use it to decide if you should, e.g.,
     write to a networked filesystem.  See
-    https://github.com/pytorch/pytorch/issues/12042 for an example of
+    https://github.com/pytorch/pytorch/issues/1204040 for an example of
     how things can go wrong if you don't do this correctly.
 """
 
