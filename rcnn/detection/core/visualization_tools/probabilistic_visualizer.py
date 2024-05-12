@@ -41,7 +41,8 @@ class ProbabilisticVisualizer(Visualizer):
             if labels is None:
                 labels = ["{:.0f}%".format(s * 100) for s in scores]
             else:
-                labels = ["{} {:.0f}%".format(l, s * 100) for l, s in zip(labels, scores)]
+                # labels = ["{} {:.0f}%".format(l, s * 100) for l, s in zip(labels, scores)]
+                labels = ["{}".format(l) for l in labels]
         if is_crowd is not None:
             labels = [l + ("|crowd" if crowd else "") for l, crowd in zip(labels, is_crowd)]
         return labels
@@ -83,6 +84,9 @@ class ProbabilisticVisualizer(Visualizer):
         # import ipdb;
         # ipdb.set_trace()
         labels = self._create_text_labels(labels, scores, self.metadata.get("thing_classes", None))
+        
+        save_labels = []
+        save_boxes = []
 
         if labels is not None:
             assert len(labels) == num_instances
@@ -173,8 +177,11 @@ class ProbabilisticVisualizer(Visualizer):
                     horizontal_alignment=horiz_align,
                     font_size=font_size,
                 )
+                save_labels.append(labels[i])
+                save_boxes.append([x0.astype('float64'), x1.astype('float64'), y0.astype('float64'), y1.astype('float64')])
 
-        return self.output
+
+        return self.output, save_labels, save_boxes
 
     def draw_box(self, box_coord, alpha=0.5, edge_color="g", line_style="-"):
         """

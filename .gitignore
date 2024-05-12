@@ -1,8 +1,10 @@
-*/__pycache__/
+*__pycache__
 data/*
 detr/snapshots/
 detr/models/ops/build/*
 !data/README.md
+backup/
+checkpoint/
 
 *.pyc
 *.pth

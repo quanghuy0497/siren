@@ -21,7 +21,7 @@ def get_clean_results_dict(config_names,
     image_corruption_levels = [0, 1, 3, 5, 10, 11]
 
     test_dataset_coco = "coco_2017_custom_val"
-    test_dataset_open_images = "openimages_val"
+    test_dataset_open_images = "openimages_ood_val"
     test_dataset_open_images_odd = "openimages_odd_val"
 
     arg_parser = setup_arg_parser()
@@ -171,7 +171,7 @@ def get_mAP_results(config_names,
     image_corruption_levels = [0, 1, 2, 3, 4, 5, 10]
 
     test_dataset_coco = "coco_2017_custom_val"
-    test_dataset_open_images = "openimages_val"
+    test_dataset_open_images = "openimages_ood_val"
 
     arg_parser = setup_arg_parser()
     args = arg_parser.parse_args()
@@ -243,7 +243,7 @@ def get_matched_results_dicts(config_names,
     image_corruption_levels = [0, 10, 11]
 
     test_dataset_coco = "coco_2017_custom_val"
-    test_dataset_open_images = "openimages_val"
+    test_dataset_open_images = "openimages_ood_val"
     test_dataset_open_images_odd = "openimages_odd_val"
 
     arg_parser = setup_arg_parser()

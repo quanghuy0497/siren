@@ -14,6 +14,7 @@ from inference import inference_utils
 import numpy as np
 import torch
 
+VOC_CLASSES = ['person', 'bird', 'cat', 'cow', 'dog', 'horse', 'sheep', 'airplane', 'bicycle', 'boat', 'bus', 'car', 'motorcycle', 'train', 'bottle', 'chair', 'dining table', 'potted plant', 'couch', 'tv']
 
 class ProbabilisticPredictor(ABC):
     """
@@ -92,7 +93,7 @@ class ProbabilisticPredictor(ABC):
                                                                      width)
         return results
 
-    def visualize_inference(self, inputs, results, savedir, name, cfg, energy_threshold=None):
+    def visualize_inference(self, inputs, results, dataset_setting, savedir, name, cfg, json_data, energy_threshold=None):
         """
         A function used to visualize final network predictions.
         It shows the original image and up to 20
@@ -105,6 +106,7 @@ class ProbabilisticPredictor(ABC):
             results (List[Instances]): a list of #images elements.
         """
         max_boxes = 20
+        
 
         required_width = inputs[0]['width']
         required_height = inputs[0]['height']
@@ -123,7 +125,10 @@ class ProbabilisticPredictor(ABC):
         # print(len(predicted_boxes))
         labels = results.det_labels[0:max_boxes]
         scores = results.scores[0:max_boxes]
+        boxes = predicted_boxes[0:max_boxes]
         # breakpoint()
+        
+        
 
         inter_feat = results.inter_feat[0:max_boxes]
         if energy_threshold:
@@ -133,21 +138,39 @@ class ProbabilisticPredictor(ABC):
         #     # breakpoint()
         # # breakpoint()
         if len(scores) == 0 or max(scores) <= 0.5:
-            return
+            return json_data
 
-        v_pred = v_pred.overlay_covariance_instances(
+        v_pred, labels, boxes = v_pred.overlay_covariance_instances(
             labels=labels,
             scores=scores,
             boxes=predicted_boxes[0:max_boxes],
             score_threshold = 0.5)
             # covariance_matrices=predicted_covar_mats[0:max_boxes])
+        
+        
+        prediction = []
+            
+        for i in range(len(boxes)):
+            xmin, xmax, ymin, ymax = boxes[i]
+
+            prediction.append({str(i): {"category": labels[i], "bounding_box": {"x1": round(xmin,3), "y1": round(ymin,3), "x2": round(xmax,3), "y2": round(ymax,3)}}})
+        
+        if "COCO" in dataset_setting:
+            name = '0'*(12 - len(name)) + name
+        
+        name = name + ".jpg"
+        if prediction: 
+            json_data[str(name)] = prediction
+        # import pdb; pdb.set_trace()
+
 
         prop_img = v_pred.get_image()
-        vis_name = f"{max_boxes} Highest Scoring Results"
         # cv2.imshow(vis_name, prop_img)
         # cv2.savefig
         cv2.imwrite(savedir + '/' + name + '.jpg', prop_img)
-        cv2.waitKey()
+        # cv2.waitKey()
+
+        return json_data
 
     @abstractmethod
     def post_processing_standard_nms(self, input_im):

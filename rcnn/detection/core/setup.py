@@ -58,7 +58,7 @@ def setup_arg_parser():
         "--test-dataset",
         type=str,
         default="",
-        help="Inference parameter: Dataset used for testing. Can be one of the following: 'coco_2017_custom_val', 'openimages_val', 'openimages_ood_val_bdd_voc' ")
+        help="Inference parameter: Dataset used for testing. Can be one of the following: 'coco_2017_custom_val', 'openimages_ood_val', 'openimages_ood_val_bdd_voc' ")
 
     arg_parser.add_argument(
         "--image-corruption-level",
@@ -82,13 +82,13 @@ def setup_arg_parser():
     arg_parser.add_argument(
         "--min-allowed-score",
         type=float,
-        default=0.0,
+        default=0.5,
         help="Evaluation parameter:Minimum classification score for which a detection is considered in the evaluation.")
 
     arg_parser.add_argument(
         '--savefigdir',
         type=str,
-        default='./savefig'
+        default='/home/ubuntu/huy.nq/ood/siren/rcnn/detection/savefig/'
     )
     arg_parser.add_argument(
         '--visualize',
@@ -208,16 +208,19 @@ def setup_config(args, random_seed=None, is_testing=False, ood=False):
     dataset_name = os.path.split(os.path.split(
         os.path.split(args.config_file)[0])[0])[-1]
     # import ipdb; ipdb.set_trace()
-    cfg['OUTPUT_DIR'] = os.path.join('/nobackup/dataset/my_xfdu/',
+    
+    cur_dir = os.getcwd() + "/backup/"
+    cfg['OUTPUT_DIR'] = os.path.join(cur_dir,
                                      dataset_name,
                                      model_name,
                                      os.path.split(args.config_file)[-1][:-5],
                                      'random_seed_' + str(random_seed))
-    if is_testing:
-        if not os.path.isdir(cfg['OUTPUT_DIR']):
-            raise NotADirectoryError(
-                "Checkpoint directory {} does not exist.".format(
-                    cfg['OUTPUT_DIR']))
+    # if is_testing:
+    #     if not os.path.isdir(cfg['OUTPUT_DIR']):
+    #         raise NotADirectoryError(
+    #             "Checkpoint directory {} does not exist.".format(
+    #                 cfg['OUTPUT_DIR']))
+
 
     os.makedirs(cfg['OUTPUT_DIR'], exist_ok=True)
 

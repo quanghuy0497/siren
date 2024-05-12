@@ -113,15 +113,15 @@ Before training, 1) modify the file address for saving the checkpoint by changin
 cd models/ops & python setup.py build install & cd ../../
 ```
 
-**Vanilla Faster-RCNN with VOC as the in-distribution dataset**
+**Vanilla DETR with VOC as the in-distribution dataset**
 ```
 GPUS_PER_NODE=8 ./tools/run_dist_launch.sh 8 ./configs/voc/vanilla.sh voc_id
 ```
-**Vanilla Faster-RCNN with BDD as the in-distribution dataset**
+**Vanilla DETR with BDD as the in-distribution dataset**
 ```
 GPUS_PER_NODE=8 ./tools/run_dist_launch.sh 8 ./configs/bdd/vanilla.sh voc_id
 ```
-**SIREN on VOC**
+**SIREN DDETR on VOC**
 ```
 GPUS_PER_NODE=8 ./tools/run_dist_launch.sh 8 ./configs/voc/siren.sh voc_id
 ```

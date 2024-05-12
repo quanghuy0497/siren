@@ -591,9 +591,10 @@ def match_predictions_to_groundtruth(predicted_box_means,
 
 def get_train_contiguous_id_to_test_thing_dataset_id_dict(
         cfg,
-        args,
+        test_dataset,
         train_thing_dataset_id_to_contiguous_id,
         test_thing_dataset_id_to_contiguous_id):
+
 
     # If both dicts are equal or if we are performing out of distribution
     # detection, just flip the test dict.
@@ -607,41 +608,41 @@ def get_train_contiguous_id_to_test_thing_dataset_id_dict(
         # ipdb.set_trace()
         # If not equal, three situations: 1) BDD to KITTI, 2) COCO to PASCAL,
         # or 3) COCO to OpenImages
-        if 'coco_ood_val' == args.test_dataset and 'voc_custom_train' == cfg.DATASETS.TRAIN[0]:
+        if 'coco_ood_val' == test_dataset and 'voc_custom_train' == cfg.DATASETS.TRAIN[0]:
             from collections import ChainMap
             cat_mapping_dict = dict(
                         ChainMap(*[{i: i + 1} for i in range(20)]))
-        elif 'voc_ood_val' == args.test_dataset and 'voc_custom_train_id' == cfg.DATASETS.TRAIN[0]:
+        elif 'voc_ood_val' == test_dataset and 'voc_custom_train_id' == cfg.DATASETS.TRAIN[0]:
             import ipdb; ipdb.set_trace()
             from collections import ChainMap
             cat_mapping_dict = dict(
                         ChainMap(*[{i: i + 1} for i in range(10)]))
-        elif 'openimages_ood_val_bdd_voc' == args.test_dataset and 'voc_custom_train' == cfg.DATASETS.TRAIN[0]:
+        elif 'openimages_ood_val' == test_dataset and 'voc_custom_train' == cfg.DATASETS.TRAIN[0]:
             from collections import ChainMap
             cat_mapping_dict = dict(
                 ChainMap(*[{i: i + 1} for i in range(20)]))
-        elif 'coco_ood_val_bdd' == args.test_dataset and 'bdd_custom_train' == cfg.DATASETS.TRAIN[0]:
+        elif 'coco_ood_val_bdd' == test_dataset and 'bdd_custom_train' == cfg.DATASETS.TRAIN[0]:
             from collections import ChainMap
             cat_mapping_dict = dict(
                 ChainMap(*[{i: i + 1} for i in range(10)]))
-        elif 'openimages_ood_val_bdd_voc' == args.test_dataset and 'bdd_custom_train' == cfg.DATASETS.TRAIN[0]:
+        elif 'openimages_ood_val' == test_dataset and 'bdd_custom_train' == cfg.DATASETS.TRAIN[0]:
             from collections import ChainMap
             cat_mapping_dict = dict(
                 ChainMap(*[{i: i + 1} for i in range(10)]))
-        elif 'voc_custom_val_ood' == args.test_dataset and 'voc_custom_train' == cfg.DATASETS.TRAIN[0]:
+        elif 'voc_custom_val_ood' == test_dataset and 'voc_custom_train' == cfg.DATASETS.TRAIN[0]:
             from collections import ChainMap
             cat_mapping_dict = dict(
                 ChainMap(*[{i: i + 1} for i in range(20)]))
         else:
             cat_mapping_dict = dict(
                 (v, k) for k, v in test_thing_dataset_id_to_contiguous_id.items())
-            if 'voc' in args.test_dataset and 'coco' in cfg.DATASETS.TRAIN[0]:
+            if 'voc' in test_dataset and 'coco' in cfg.DATASETS.TRAIN[0]:
                 dataset_mapping_dict = dict(
                     (v, k) for k, v in metadata.COCO_TO_VOC_CONTIGUOUS_ID.items())
-            if 'openimages' in args.test_dataset and 'coco' in cfg.DATASETS.TRAIN[0]:
+            if 'openimages' in test_dataset and 'coco' in cfg.DATASETS.TRAIN[0]:
                 dataset_mapping_dict = dict(
                     (v, k) for k, v in metadata.COCO_TO_OPENIMAGES_CONTIGUOUS_ID.items())
-            elif 'kitti' in args.test_dataset and 'bdd' in cfg.DATASETS.TRAIN[0]:
+            elif 'kitti' in test_dataset and 'bdd' in cfg.DATASETS.TRAIN[0]:
                 dataset_mapping_dict = dict(
                     (v, k) for k, v in metadata.BDD_TO_KITTI_CONTIGUOUS_ID.items())
             else:

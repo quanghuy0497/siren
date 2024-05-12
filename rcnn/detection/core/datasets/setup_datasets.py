@@ -78,14 +78,14 @@ def setup_openim_dataset(dataset_dir):
         dataset_dir, 'COCO-Format', 'val_coco_format.json')
 
     register_coco_instances(
-        "openimages_val",
+        "openimages_ood_val",
         {},
         test_json_annotations,
         test_image_dir)
     MetadataCatalog.get(
-        "openimages_val").thing_classes = metadata.COCO_THING_CLASSES
+        "openimages_ood_val").thing_classes = metadata.COCO_THING_CLASSES
     MetadataCatalog.get(
-        "openimages_val").thing_dataset_id_to_contiguous_id = metadata.OPENIMAGES_THING_DATASET_ID_TO_CONTIGUOUS_ID
+        "openimages_ood_val").thing_dataset_id_to_contiguous_id = metadata.OPENIMAGES_THING_DATASET_ID_TO_CONTIGUOUS_ID
 
 
 def setup_openim_odd_dataset(dataset_dir):

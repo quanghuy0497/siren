@@ -8,7 +8,7 @@ from torch import nn
 import torch.nn.functional as F
 from sklearn import covariance
 from vmf import vMFLogPartition
-
+import os
 from detectron2.config import configurable
 from detectron2.layers import ShapeSpec, nonzero_tuple
 from detectron2.structures import Boxes, ImageList, Instances, pairwise_iou
@@ -533,6 +533,8 @@ class ROIHeadsLogisticGMMNew(ROIHeads):
         self.iterations = self.cfg.SOLVER.MAX_ITER
         self.vmf_loss_weight = self.cfg.SIREN.LOSS_WEIGHT
         self.output_dir = './saved_mean_kappa'
+        if not os.path.exists(self.output_dir):
+            os.mkdir(self.output_dir)
 
 
         self.projection_dim = self.cfg.SIREN.PROJECTION_DIM # sometimes 32 is better. TBD

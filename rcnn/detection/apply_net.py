@@ -62,11 +62,13 @@ def main(args):
     test_thing_dataset_id_to_contiguous_id = MetadataCatalog.get(
         args.test_dataset).thing_dataset_id_to_contiguous_id
 
+    test_dataset = args.test_dataset
+
     # If both dicts are equal or if we are performing out of distribution
     # detection, just flip the test dict.
     cat_mapping_dict = get_train_contiguous_id_to_test_thing_dataset_id_dict(
         cfg,
-        args,
+        test_dataset,
         train_thing_dataset_id_to_contiguous_id,
         test_thing_dataset_id_to_contiguous_id)
 
@@ -79,7 +81,26 @@ def main(args):
 
     test_data_loader.num_workers=0
 
-    # import ipdb; ipdb.set_trace();
+    output_dir = "prediction_json/"
+    
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    
+    if "voc" in args.test_dataset and "voc_custom_train" in args.test_dataset:
+        dataset_setting = "VOC_id_train"
+    elif "voc" in args.test_dataset and "voc_custom_val" in args.test_dataset:
+        dataset_setting = "VOC_id_val"
+    elif "coco" in args.test_dataset :
+        dataset_setting = "VOC_id_COCO_ood"
+    elif "openimages" in args.test_dataset :
+        dataset_setting = "VOC_id_OpenImages_ood"
+        
+    backbone_name = "FasterRCNN"
+
+    f = open(os.path.join(output_dir, f'{backbone_name}_{dataset_setting}.json'), 'w')
+
+    
+    json_data = {}
 
     if not args.eval_only:
         with torch.no_grad():
@@ -94,12 +115,13 @@ def main(args):
                         if not os.path.exists(args.savefigdir):
                             os.makedirs(args.savefigdir)
                         
-                        predictor.visualize_inference(input_im,
-                                                      outputs,
+                        json_data = predictor.visualize_inference(input_im,
+                                                      outputs, dataset_setting,
                                                       savedir=args.savefigdir,
                                                       name=str(input_im[0]['image_id']),
-                                                      cfg=cfg,
+                                                      cfg=cfg, json_data = json_data,
                                                       energy_threshold=8.868)
+                        
 
 
                     final_output_list.extend(
@@ -120,6 +142,9 @@ def main(args):
     else:
         compute_average_precision.main(args, cfg)
         compute_ood_probabilistic_metrics.main(args, cfg)
+    
+    json.dump(json_data , f)
+    f.close()
 
 
 

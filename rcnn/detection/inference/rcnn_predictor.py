@@ -154,9 +154,10 @@ class GeneralizedRcnnPlainPredictor(ProbabilisticPredictor):
             box_delta = box_delta[filter_mask]
 
         det_labels = torch.arange(scores.shape[1], dtype=torch.long)
-        det_labels = det_labels.view(1, -1).expand_as(scores)
+        det_labels = det_labels.view(1, -1).expand_as(scores).to('cuda:0')
 
-        # import ipdb; ipdb.set_trace();
+        # import pdb; pdb.set_trace()
+
         scores = scores[filter_mask]
         det_labels = det_labels[filter_mask]
 

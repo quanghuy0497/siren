@@ -1,8 +1,7 @@
 _BASE_: "../../Base-RCNN-FPN.yaml"
 MODEL:
   META_ARCHITECTURE: "GeneralizedRCNNLogisticGMM"
-  # WEIGHTS: "detectron2://ImageNetPretrained/MSRA/R-50.pkl"
-  WEIGHTS: "/home/ubuntu/huy.nq/ood/siren/rcnn/detection/checkpoint/model_siren_voc_64.pth"
+  WEIGHTS: "detectron2://ImageNetPretrained/MSRA/R-50.pkl"
 
   MASK_ON: False
   RESNETS:
