@@ -48,7 +48,7 @@ def plot_results(pil_img, prob, boxes, output_dir, classes, targets, json_data, 
         text = f'{CLASSES[cl]}: {p:0.2f}'
         ax.text(xmin, ymin, text, fontsize=15,
                 bbox=dict(facecolor='yellow', alpha=0.5))
-        prediction.append({str(obj_id): {"category": CLASSES[cl], "bounding_box": {"x1": round(xmin,3), "y1": round(ymin,3), "x2": round(xmax,3), "y2": round(ymax,3)}}})
+        prediction.append({str(obj_id): {"category": CLASSES[cl], "confidence_score": round(p, 3), "bounding_box": {"x1": round(xmin,3), "y1": round(ymin,3), "x2": round(xmax,3), "y2": round(ymax,3)}}})
         obj_id = obj_id + 1
     if prediction: 
         json_data[original_file_name] = prediction
